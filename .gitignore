@@ -65,3 +65,6 @@ celerybeat-schedule.*
 !.vscode/launch.json 
 !.vscode/extensions.json 
 .history
+
+
+tmp/

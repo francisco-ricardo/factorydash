@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+
+  web:
+    container_name: factorydash.dev
+    image: factorydash.dev:latest
+    build: 
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - .:/workspace
+    ports:
+      - "8000:8000"
+

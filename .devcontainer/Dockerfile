@@ -5,7 +5,11 @@ FROM python:latest
 WORKDIR /workspace
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y curl
+RUN apt update && apt install -y \
+    git \
+    curl \
+    openssh-client \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements.txt from the root of the project
 COPY requirements.txt /workspace/requirements.txt
@@ -17,5 +21,7 @@ RUN pip install --no-cache-dir -r /workspace/requirements.txt
 EXPOSE 8000
 
 # Set default command
-CMD ["bash"]
+ENTRYPOINT ["/workspace/docker-entrypoint-dev.sh"]
+CMD ["/workspace/docker-cmd-script-dev.sh"]
 
+# EOF
