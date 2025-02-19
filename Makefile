@@ -15,6 +15,7 @@ all: run
 run:
 	docker-compose -f compose.yaml up --build -d
 
+# target: rundev
 rundev:
 	docker-compose -f docker-compose-dev.yaml up --build -d
 
