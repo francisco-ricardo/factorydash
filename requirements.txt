@@ -1,4 +1,7 @@
 Django
 psycopg2-binary
 dj-database-url
+requests
+lxml
+pytz
 

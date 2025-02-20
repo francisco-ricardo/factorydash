@@ -1,6 +1,31 @@
+TODO:
+
+Streams: A set of Samples, Events, or Conditon for components and devices.
+
+Antes de avaçar para o step 4, tratar os seguintes assuntos
+
+1. Considerar Samples
+
+<ComponentStream component="Linear" componentId="x" name="X"> 1672 
+ <Samples> 1673 
+  <Position timestamp="2010-03-01T12:09:31.021" dataItemId="Xpos" se-1674 
+quence="122" >13.0003</Position> 1675 
+  <Temperature timestamp="2010-03-01T12:07:22.031" dataItemId="Xpos" se-1676 
+quence="113" >102</Temperature> 1677 
+ </Samples> 1678 
+</ComponentStream>
+
+2. Considerar Condition
+
+3. Eliminar espaços do início e do fim das strings
+
+4. Configurar log
+
 # DESCRIPTION
 Real-time insights for Smart Manufacturing
 
+
+ Manufacturing, Interoperability in manufacturing, Manufacturing systems design and analysis and Systems integration
 
 ## Project Architecture
 
@@ -51,7 +76,13 @@ Real-time insights for Smart Manufacturing
 
 
 
+Real-time stream of most current value for each data item: https://smstestbed.nist.gov/vds/current
+
 NIST_API_URL = "https://smstestbed.nist.gov/vds/current"
+
+
+Information
+https://www.nist.gov/laboratories/tools-instruments/smart-manufacturing-systems-sms-test-bed
 
 
 docker build -t factorydash:latest -f .devcontainer/Dockerfile .
