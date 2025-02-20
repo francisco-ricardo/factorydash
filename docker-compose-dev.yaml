@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
 
-  web:
+  factorydash.dev:
     container_name: factorydash.dev
     image: factorydash.dev:latest
     build: 
@@ -12,4 +12,23 @@ services:
       - .:/workspace
     ports:
       - "8000:8000"
+    environment:
+      - DATABASE_URL=postgres://factorydash:factorydash@db:5432/factorydash
+
+  db:
+    container_name: factorydash.db
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: factorydash
+      POSTGRES_PASSWORD: factorydash
+      POSTGRES_DB: factorydash
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+
 
