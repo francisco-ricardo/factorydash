@@ -17,6 +17,7 @@ class MachineData(models.Model):
     value = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
+        db_table = "machinedata"
         indexes = [
             models.Index(fields=['timestamp']),
             models.Index(fields=['data_item_id']),
