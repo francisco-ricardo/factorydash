@@ -4,4 +4,6 @@ dj-database-url
 requests
 lxml
 pytz
+celery
+redis
 
