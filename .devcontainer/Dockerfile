@@ -26,6 +26,10 @@ ENV LC_ALL en_US.UTF-8
 # Copy requirements.txt from the root of the project
 COPY requirements.txt /workspace/requirements.txt
 
+# Copy scripts for the container startup
+COPY docker-entrypoint-dev.sh /workspace/docker-entrypoint-dev.sh
+COPY docker-cmd-script-dev.sh /workspace/docker-cmd-script-dev.sh
+
 # Install Django dependencies
 RUN pip install --no-cache-dir -r /workspace/requirements.txt
 

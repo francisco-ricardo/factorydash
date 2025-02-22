@@ -19,19 +19,22 @@ from monitoring.models import MachineData
 NIST_API_URL = "https://smstestbed.nist.gov/vds/current"
 
 # Configure logging
-logging.basicConfig(
-    filename="nist_loader.log",
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-)
+# logging.basicConfig(
+#     filename="nist_loader.log",
+#     level=logging.INFO,
+#     format="%(asctime)s [%(levelname)s] %(message)s",
+# )
+
+logger = logging.getLogger("factorydash")  # Use Django logging system
+
 
 def fetch_nist_data() -> Optional[str]:
     """Fetch XML data from the NIST API."""
     response = requests.get(NIST_API_URL)
     if response.status_code == 200:
-        logging.info("Successfully fetched XML data from NIST API.")
+        logger.info("Successfully fetched XML data from NIST API.")
         return response.text
-    logging.error("Failed to retrieve data from NIST API")
+    logger.error("Failed to retrieve data from NIST API")
     return None
 
 
@@ -62,7 +65,7 @@ def parse_nist_xml(xml_data: str) -> Generator[Dict[str, Any], None, None]:
                 "value": element.text.strip() if element.text else None,
             }
 
-            logging.info(f"Parsed Record: {record}")  # ✅ Log parsed data
+            logger.info(f"Parsed Record: {record}")  # ✅ Log parsed data
             yield record
 
 
@@ -70,7 +73,7 @@ def save_nist_data() -> None:
     """Fetch, parse, and save data to the database."""
     xml_data = fetch_nist_data()
     if not xml_data:
-        logging.error("No XML data received from NIST API.")
+        logger.error("No XML data received from NIST API.")
         return
 
     parsed_data = parse_nist_xml(xml_data)
@@ -86,7 +89,7 @@ def save_nist_data() -> None:
         )
         count += 1
 
-    logging.info(f"Successfully saved {count} records from NIST API.")
+    logger.info(f"Successfully saved {count} records from NIST API.")
 
 
 # For testing locally:
