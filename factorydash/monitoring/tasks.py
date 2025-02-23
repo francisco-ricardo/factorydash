@@ -1,9 +1,9 @@
 from celery.schedules import crontab
-from celery import Celery
 from celery import shared_task
 import logging
 
 from monitoring.data_loader import save_nist_data
+from monitoring.management.commands.cleanup_old_data import Command
 
 
 logger = logging.getLogger("factorydash")
@@ -19,6 +19,17 @@ def fetch_nist_data_task() -> str:
     except Exception as e:
         logger.error(f"Celery Task Error: {str(e)}")
         return "NIST API task failed."
+
+@shared_task
+def cleanup_old_data_task():
+    try:
+        command = Command()
+        command.handle()
+        logger.info("Celery Task: Successfully deleted old data")
+        return "Successfully deleted old data"
+    except Exception as e:
+        logger.error(f"Celery Task: Cleanup old data Task Error: {str(e)}")
+        return "Cleanup old data Task Error."
 
 
 # EOF

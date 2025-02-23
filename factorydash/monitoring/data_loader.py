@@ -9,7 +9,14 @@ from datetime import datetime
 from typing import Generator, Dict, Any, Optional
 
 # Set up Django environment
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+#sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+#sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+#os.environ.setdefault("DJANGO_SETTINGS_MODULE", "factorydash.settings")
+#django.setup()
+
+# Set up Django environment
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BASE_DIR)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "factorydash.settings")
 django.setup()
 
@@ -94,5 +101,8 @@ def save_nist_data() -> None:
 
 # For testing locally:
 if __name__ == "__main__":
+    print(f"Sys path: {sys.path}")
+    print(f"BASE_DIR: {BASE_DIR}")
+    print(f"LOGS_DIR: {LOGS_DIR}")
     save_nist_data()
 

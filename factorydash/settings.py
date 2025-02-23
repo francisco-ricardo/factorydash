@@ -19,7 +19,9 @@ from logging.handlers import RotatingFileHandler
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-#BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+#BASE_DIR = Path(__file__).resolve().parent
+#BASE_DIR = os.path.abspath(__file__)
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -155,7 +157,9 @@ DATA_RETENTION_DAYS = 5 if IS_PRODUCTION else 2
 # Logging configuration
 
 # Ensure logs directory exists before logging starts
-LOGS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "logs")
+#LOGS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "logs")
+LOGS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
+
 os.makedirs(LOGS_DIR, exist_ok=True)  # Auto-creates logs directory
 
 LOGGING = {
