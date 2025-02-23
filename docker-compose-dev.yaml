@@ -5,6 +5,7 @@ services:
   factorydash.dev:
     container_name: factorydash.dev
     image: factorydash.dev:latest
+    restart: always
     build: 
       context: .
       dockerfile: .devcontainer/Dockerfile
@@ -15,6 +16,9 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgres://factorydash:factorydash@db:5432/factorydash
+    depends_on:
+      - db  # Ensure db is started before factorydash.dev
+      - redis # Ensure redis is started before factorydash.dev
 
   db:
     container_name: factorydash.db
@@ -28,6 +32,13 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    container_name: factorydash.redis
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
 
 volumes:
   postgres_data:
