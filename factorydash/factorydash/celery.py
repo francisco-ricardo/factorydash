@@ -1,5 +1,6 @@
 import os
 from celery import Celery
+from celery.schedules import crontab
 
 
 # Set default Django settings
@@ -19,5 +20,12 @@ app.conf.beat_schedule = {
         "schedule": 10.0,  # Executa a cada 10 segundos
     },
 }
+
+app.conf.beat_schedule.update({
+    "cleanup-old-data-daily": {
+        "task": "monitoring.tasks.cleanup_old_data_task",
+        "schedule": crontab(hour=14, minute=0),  # Run daily at 14:00
+    },
+})
 
 # EOF

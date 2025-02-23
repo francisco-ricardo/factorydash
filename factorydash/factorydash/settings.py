@@ -147,6 +147,10 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 if DATABASE_URL:
     DATABASES['default'] = dj_database_url.config(default=DATABASE_URL)
 
+# Define the data retention policy
+IS_PRODUCTION = os.getenv("RAILWAY_ENVIRONMENT", "development") == "production"
+DATA_RETENTION_DAYS = 5 if IS_PRODUCTION else 2
+
 
 # Logging configuration
 
