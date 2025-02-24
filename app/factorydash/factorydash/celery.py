@@ -2,9 +2,10 @@ import os
 from celery import Celery
 from celery.schedules import crontab
 
+from factorydash.defaults import default_path_definition
 
 # Set default Django settings
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "factorydash.settings")
+default_path_definition()
 
 # Initialize Celery
 app = Celery("factorydash")
@@ -17,7 +18,7 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     "fetch-nist-data-every-10-seconds": {
         "task": "monitoring.tasks.fetch_nist_data_task",
-        "schedule": 10.0,  # Executa a cada 10 segundos
+        "schedule": 10.0,  # Execute every 10 seconds
     },
 }
 

@@ -1,6 +1,5 @@
 import os
 import sys
-import django
 import requests
 import xml.etree.ElementTree as ET
 import pytz
@@ -8,30 +7,13 @@ import logging
 from datetime import datetime
 from typing import Generator, Dict, Any, Optional
 
-# Set up Django environment
-#sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-#sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-#os.environ.setdefault("DJANGO_SETTINGS_MODULE", "factorydash.settings")
-#django.setup()
-
-# Set up Django environment
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(BASE_DIR)
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "factorydash.settings")
-django.setup()
-
 from monitoring.models import MachineData
 
+# Set default Django settings
+from factorydash.defaults import default_path_definition
+default_path_definition()
 
 NIST_API_URL = "https://smstestbed.nist.gov/vds/current"
-
-# Configure logging
-# logging.basicConfig(
-#     filename="nist_loader.log",
-#     level=logging.INFO,
-#     format="%(asctime)s [%(levelname)s] %(message)s",
-# )
-
 logger = logging.getLogger("factorydash")  # Use Django logging system
 
 
@@ -102,7 +84,5 @@ def save_nist_data() -> None:
 # For testing locally:
 if __name__ == "__main__":
     print(f"Sys path: {sys.path}")
-    print(f"BASE_DIR: {BASE_DIR}")
-    print(f"LOGS_DIR: {LOGS_DIR}")
     save_nist_data()
 

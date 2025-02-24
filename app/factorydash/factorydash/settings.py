@@ -16,19 +16,15 @@ import os
 import dj_database_url
 from logging.handlers import RotatingFileHandler
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-#BASE_DIR = Path(__file__).resolve().parent
-#BASE_DIR = os.path.abspath(__file__)
-
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2!o%5wdzwd2-q+7u$$3r9!+fd7oh8%x+&snrl17yf-am))k-9#'
+SECRET_KEY = 'django-insecure-qwba_g+u=^%nl2%p2ih(uzw%jwch6#8r2@z4)nth#e0o1y%mtk'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -77,17 +73,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'factorydash.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 
 # Password validation
@@ -157,9 +142,7 @@ DATA_RETENTION_DAYS = 5 if IS_PRODUCTION else 2
 # Logging configuration
 
 # Ensure logs directory exists before logging starts
-#LOGS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "logs")
 LOGS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
-
 os.makedirs(LOGS_DIR, exist_ok=True)  # Auto-creates logs directory
 
 LOGGING = {

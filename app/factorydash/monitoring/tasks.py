@@ -1,4 +1,3 @@
-from celery.schedules import crontab
 from celery import shared_task
 import logging
 
