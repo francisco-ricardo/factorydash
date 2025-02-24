@@ -2,7 +2,7 @@
 FROM python:latest
 
 # Set the working directory inside the container
-WORKDIR /workspace
+WORKDIR /factorydash
 
 # Install system dependencies
 RUN apt update && apt install -y \
@@ -24,20 +24,20 @@ ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 
 # Copy requirements.txt from the root of the project
-COPY requirements.txt /workspace/requirements.txt
+COPY requirements.txt /factorydash/requirements.txt
 
 # Copy scripts for the container startup
-COPY docker-entrypoint-dev.sh /workspace/docker-entrypoint-dev.sh
-COPY docker-cmd-script-dev.sh /workspace/docker-cmd-script-dev.sh
+COPY docker-entrypoint-dev.sh /factorydash/docker-entrypoint-dev.sh
+COPY docker-cmd-script-dev.sh /factorydash/docker-cmd-script-dev.sh
 
 # Install Django dependencies
-RUN pip install --no-cache-dir -r /workspace/requirements.txt
+RUN pip install --no-cache-dir -r /factorydash/requirements.txt
 
 # Expose Django's default port
 EXPOSE 8000
 
 # Set default command
-ENTRYPOINT ["/workspace/docker-entrypoint-dev.sh"]
-CMD ["/workspace/docker-cmd-script-dev.sh"]
+ENTRYPOINT ["/factorydash/docker-entrypoint-dev.sh"]
+CMD ["/factorydash/docker-cmd-script-dev.sh"]
 
 # EOF

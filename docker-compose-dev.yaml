@@ -11,7 +11,7 @@ services:
       dockerfile: .devcontainer/Dockerfile
     volumes:
       - .:/workspace
-      - logs_volume:/workspace/factorydash/logs  # Persist logs outside the container
+      - logs_volume:/factorydash/app/logs  # Persist logs outside the container
     ports:
       - "8000:8000"
     environment:
