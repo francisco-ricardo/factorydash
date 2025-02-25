@@ -55,9 +55,6 @@ coverage.xml
 # pyenv 
 .python-version 
 
-# celery 
-celerybeat-schedule.* 
-
 # Visual Studio Code # 
 .vscode/ 
 !.vscode/settings.json 
@@ -68,9 +65,10 @@ celerybeat-schedule.*
 
 
 tmp/
-app/factorydash/logs/
+app/factorydash/logs/*
 
 # Ignore Celery beat schedule files
+celerybeat-schedule
 celerybeat-schedule.*
 celerybeat-schedule-shm
 celerybeat-schedule-wal

@@ -1,23 +1,32 @@
 # Makefile Documentation
 # This Makefile provides a simple interface for managing the project using Docker.
 
-.PHONY: all run rundev help
+.PHONY: all up updev downdev help
 
 
 # target: all - Executes the run
-all: run
+all: up
 
 
 # target: run - Builds and starts the Docker container
 # Description: This target builds and starts the Docker container using the
 # docker-compose command. The -d flag runs the containers in detached mode,
 # allowing them to run in the background.
-run:
+up:
 	docker-compose -f compose.yaml up --build -d
 
 # target: rundev
-rundev:
+updev:
 	docker-compose -f docker-compose-dev.yaml up --build -d
+
+
+downdev:
+	docker stop factorydash.dev
+	docker rm factorydash.dev
+	docker stop factorydash.celery_worker
+	docker rm factorydash.celery_worker
+	docker stop factorydash.celery_beat
+	docker rm factorydash.celery_beat
 
 
 # target: help - Displays the available executable targets

@@ -19,13 +19,12 @@ app.conf.beat_schedule = {
         "task": "monitoring.tasks.fetch_nist_data_task",
         "schedule": 10.0,  # Execute every 10 seconds
     },
-}
-
-app.conf.beat_schedule.update({
     "cleanup-old-data-daily": {
         "task": "monitoring.tasks.cleanup_old_data_task",
-        "schedule": crontab(hour=14, minute=0),  # Run daily at 14:00
+        "schedule": crontab(hour=14, minute=34),  # Run daily at 14:00
     },
-})
+}
+
+
 
 # EOF
