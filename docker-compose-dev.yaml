@@ -9,14 +9,17 @@ services:
     build: 
       context: .
       dockerfile: .devcontainer/Dockerfile
+    working_dir: /factorydash/app/factorydash
     volumes:
-      - .:/workspace
+      - .:/factorydash
       - logs_volume:/factorydash/app/logs  # Persist logs outside the container
     ports:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgres://factorydash:factorydash@db:5432/factorydash
       - CELERY_BROKER_URL=redis://redis:6379/0
+      - PYTHONPATH=/factorydash/app
+      - DJANGO_SETTINGS_MODULE=factorydash.settings
     depends_on:
       - db  # Ensure db is started before factorydash.dev
       - redis # Ensure redis is started before factorydash.dev
@@ -25,25 +28,27 @@ services:
     container_name: factorydash.celery_worker
     image: factorydash.dev:latest
     restart: always
-    command: celery -A factorydash worker --loglevel=info
+    command: celery -A factorydash.celery worker --loglevel=info
     depends_on:
       - factorydash.dev
       - redis
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
-      - DJANGO_SETTINGS_MODULE=factorydash.settings
+      - PYTHONPATH=/factorydash/app
+      - DJANGO_SETTINGS_MODULE=factorydash.settings      
 
   celery_beat:
     container_name: factorydash.celery_beat
     image: factorydash.dev:latest
     restart: always
-    command: celery -A factorydash beat --loglevel=info
+    command: celery -A factorydash.celery beat --loglevel=info
     depends_on:
       - factorydash.dev
       - redis
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
-      - DJANGO_SETTINGS_MODULE=factorydash.settings
+      - PYTHONPATH=/factorydash/app
+      - DJANGO_SETTINGS_MODULE=factorydash.settings      
 
   db:
     container_name: factorydash.db

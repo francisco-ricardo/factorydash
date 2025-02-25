@@ -4,9 +4,7 @@ import django
 
 
 def default_path_definition() -> None:
-    # Set up Django environment
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    sys.path.append(BASE_DIR)
+    """Set up Django environment for Celery"""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "factorydash.settings")
     django.setup()
 
