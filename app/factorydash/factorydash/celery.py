@@ -14,14 +14,15 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
 # Tasks scheduling (Celery Beat)
+# TODO: AJUSTAR O SCHEDULE PARA 10 SEGUNDOS
 app.conf.beat_schedule = {
     "fetch-nist-data-every-10-seconds": {
         "task": "monitoring.tasks.fetch_nist_data_task",
-        "schedule": 10.0,  # Execute every 10 seconds
+        "schedule": 600.0,  # Execute every 10 seconds
     },
     "cleanup-old-data-daily": {
-        "task": "monitoring.tasks.cleanup_old_data_task",
-        "schedule": crontab(hour=14, minute=34),  # Run daily at 14:00
+        "task": "monitoring.tasks.cleanup_task",
+        "schedule": crontab(hour=19, minute=15),  # Run daily at 00:00
     },
 }
 
