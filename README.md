@@ -278,3 +278,6 @@ celery -A factorydash beat --loglevel=info
 
  select * from machinedata order by timestamp desc limit 10;
  select * from machinedata order by timestamp asc limit 10;
+
+
+  python manage.py test factorydash
