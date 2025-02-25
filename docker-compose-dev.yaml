@@ -18,7 +18,7 @@ services:
     environment:
       - DATABASE_URL=postgres://factorydash:factorydash@db:5432/factorydash
       - CELERY_BROKER_URL=redis://redis:6379/0
-      - PYTHONPATH=/factorydash/app
+      - PYTHONPATH=/factorydash/app/factorydash
       - DJANGO_SETTINGS_MODULE=factorydash.settings
     depends_on:
       - db  # Ensure db is started before factorydash.dev
@@ -28,26 +28,30 @@ services:
     container_name: factorydash.celery_worker
     image: factorydash.dev:latest
     restart: always
-    command: celery -A factorydash.celery worker --loglevel=info
+    command: celery -A factorydash worker --loglevel=info
+    volumes:
+      - .:/factorydash
     depends_on:
       - factorydash.dev
       - redis
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
-      - PYTHONPATH=/factorydash/app
+      - PYTHONPATH=/factorydash/app/factorydash
       - DJANGO_SETTINGS_MODULE=factorydash.settings      
 
   celery_beat:
     container_name: factorydash.celery_beat
     image: factorydash.dev:latest
     restart: always
-    command: celery -A factorydash.celery beat --loglevel=info
+    command: celery -A factorydash beat --loglevel=info
+    volumes:
+      - .:/factorydash
     depends_on:
       - factorydash.dev
       - redis
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
-      - PYTHONPATH=/factorydash/app
+      - PYTHONPATH=/factorydash/app/factorydash
       - DJANGO_SETTINGS_MODULE=factorydash.settings      
 
   db:

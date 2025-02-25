@@ -273,3 +273,8 @@ celery -A factorydash beat --loglevel=info
 2️⃣ **Check logs for any errors or missing data.**
 3️⃣ **If everything works, we move to Step 4: Web Dashboard with Django Templates + Chart.js!** 🚀
 
+
+
+
+ select * from machinedata order by timestamp desc limit 10;
+ select * from machinedata order by timestamp asc limit 10;

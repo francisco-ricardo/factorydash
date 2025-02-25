@@ -6,4 +6,5 @@ lxml
 pytz
 celery
 redis
+django-celery-beat
 
