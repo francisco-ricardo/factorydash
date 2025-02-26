@@ -137,7 +137,7 @@ if DATABASE_URL:
 
 # Define the data retention policy
 IS_PRODUCTION = os.getenv("RAILWAY_ENVIRONMENT", "development") == "production"
-DATA_RETENTION_DAYS = 5 if IS_PRODUCTION else 2
+DATA_RETENTION_DAYS = 3 if IS_PRODUCTION else 2
 
 
 # Logging configuration

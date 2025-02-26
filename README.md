@@ -281,3 +281,15 @@ celery -A factorydash beat --loglevel=info
 
 
   python manage.py test factorydash
+
+
++-------------------+       +-------------------+       +-------------------+
+|                   |       |                   |       |                   |
+|      Django       |       |      Celery       |       |    PostgreSQL     |
+|                   |       |                   |       |                   |
+|  - Web Framework  |       |  - Task Queue     |       |  - Database       |
+|  - Models         |       |  - Task Scheduler |       |                   |
+|  - Views          |       |                   |       |                   |
+|  - Management     |       |                   |       |                   |
+|    Commands       |       |                   |       |                   |
++---------+---------+       +---------+---------+       +---------+---------+
