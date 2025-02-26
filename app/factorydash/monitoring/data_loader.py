@@ -1,29 +1,22 @@
-import os
-import sys
+import factorydash  # This will set up the Django environment
+
 import requests
 import xml.etree.ElementTree as ET
 import pytz
-import logging
 from datetime import datetime
 from typing import Generator, Dict, Any, Optional
 
 from monitoring.models import MachineData
 
-# Set default Django settings
-from factorydash.defaults import default_path_definition
-default_path_definition()
-
-NIST_API_URL = "https://smstestbed.nist.gov/vds/current"
-logger = logging.getLogger("factorydash")  # Use Django logging system
-
 
 def fetch_nist_data() -> Optional[str]:
     """Fetch XML data from the NIST API."""
+    NIST_API_URL = "https://smstestbed.nist.gov/vds/current"
     response = requests.get(NIST_API_URL)
     if response.status_code == 200:
-        logger.info("Successfully fetched XML data from NIST API.")
+        factorydash.logger.info("Successfully fetched XML data from NIST API.")
         return response.text
-    logger.error("Failed to retrieve data from NIST API")
+    factorydash.logger.error("Failed to retrieve data from NIST API")
     return None
 
 
@@ -54,7 +47,7 @@ def parse_nist_xml(xml_data: str) -> Generator[Dict[str, Any], None, None]:
                 "value": element.text.strip() if element.text else None,
             }
 
-            logger.info(f"Parsed Record: {record}")  # ✅ Log parsed data
+            factorydash.logger.info(f"Parsed Record: {record}")  # Log parsed data
             yield record
 
 
@@ -62,7 +55,7 @@ def save_nist_data() -> None:
     """Fetch, parse, and save data to the database."""
     xml_data = fetch_nist_data()
     if not xml_data:
-        logger.error("No XML data received from NIST API.")
+        factorydash.logger.error("No XML data received from NIST API.")
         return
 
     parsed_data = parse_nist_xml(xml_data)
@@ -78,11 +71,12 @@ def save_nist_data() -> None:
         )
         count += 1
 
-    logger.info(f"Successfully saved {count} records from NIST API.")
+    factorydash.logger.info(f"Successfully saved {count} records from NIST API.")
 
 
-# For testing locally:
+# For testing locally
 if __name__ == "__main__":
-    print(f"Sys path: {sys.path}")
     save_nist_data()
+
+# EOF
 

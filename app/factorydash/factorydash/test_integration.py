@@ -1,7 +1,10 @@
+import factorydash  # This will set up the Django environment and logging
+
 from django.test import TestCase
 from django.db import connections
 from django.core.cache import cache
 from celery import Celery
+
 
 class FactoryDashIntegrationTests(TestCase):
     def test_database_connection(self):
@@ -24,3 +27,6 @@ class FactoryDashIntegrationTests(TestCase):
             app.send_task('celery.ping')
         except Exception as e:
             self.fail(f"Celery connection failed: {e}")
+
+
+# EOF

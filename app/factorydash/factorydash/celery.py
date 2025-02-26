@@ -1,9 +1,7 @@
+import factorydash  # This will set up the Django environment
+
 from celery import Celery
 from celery.schedules import crontab
-
-# Set Django environment
-from factorydash.defaults import set_django_environment
-set_django_environment()
 
 # Initialize Celery
 app = Celery("factorydash")
