@@ -281,6 +281,11 @@ celery -A factorydash beat --loglevel=info
 
 
   python manage.py test factorydash
+  python manage.py cleanup
+
+
+  TODO: IMPLEMENTAR data_loader como Command:
+  python manage.py loaddata
 
 
 +-------------------+       +-------------------+       +-------------------+
