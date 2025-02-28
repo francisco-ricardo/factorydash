@@ -1,3 +1,11 @@
+"""
+This module sets up the Django environment, logging, and Celery for the 
+factorydash project.
+
+It ensures that the Django settings are configured, logging is set up, 
+and the Celery app is always imported when Django starts.
+"""
+
 from __future__ import absolute_import, unicode_literals
 import os
 import sys

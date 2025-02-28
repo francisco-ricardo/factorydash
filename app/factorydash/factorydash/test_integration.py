@@ -1,3 +1,10 @@
+"""
+This module contains integration tests for the factorydash project.
+
+It includes tests for database connection, Redis connection, 
+and Celery connection.
+"""
+
 import factorydash  # This will set up the Django environment and logging
 
 from django.test import TestCase
@@ -7,11 +14,19 @@ from celery import Celery
 
 
 class FactoryDashIntegrationTests(TestCase):
+    """
+    Integration tests for the factorydash project.
+    
+    This class includes tests to verify the database connection, 
+    Redis connection, and Celery connection.
+    """
+        
     def test_database_connection(self):
         try:
             connections['default'].cursor()
         except Exception as e:
             self.fail(f"Database connection failed: {e}")
+
 
     def test_redis_connection(self):
         try:
@@ -19,6 +34,7 @@ class FactoryDashIntegrationTests(TestCase):
             cache.get('test_key')
         except Exception as e:
             self.fail(f"Redis connection failed: {e}")
+            
 
     def test_celery_connection(self):
         app = Celery('factorydash')
