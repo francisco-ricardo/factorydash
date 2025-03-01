@@ -7,4 +7,7 @@ pytz
 celery
 redis
 django-celery-beat
+pytest 
+pytest-django 
+pytest-mock
 

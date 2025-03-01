@@ -21,7 +21,7 @@ def cleanup_task() -> str:
     try:
         call_command('cleanup')
         factorydash.logger.info("Celery Task: Successfully deleted old data")
-        return "Successfully deleted old data"
+        return "Successfully deleted old data."
     except Exception as e:
         factorydash.logger.error(f"Celery Task: Cleanup old data Task Error: {str(e)}")
         return "Cleanup old data Task Error."
