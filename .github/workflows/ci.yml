@@ -38,6 +38,9 @@ jobs:
       DJANGO_SETTINGS_MODULE: factorydash.settings_test
 
     steps:
+    - name: Set PYTHONPATH
+      run: echo "PYTHONPATH=/factorydash/app/factorydash" >> $GITHUB_ENV
+
     - name: Checkout code
       uses: actions/checkout@v4
 
@@ -73,7 +76,7 @@ jobs:
 
     - name: Run Docker container
       run: |
-        docker run -d --name factorydash_container -p 8001:8000 factorydash  # Use port 8001 on the host to avoid conflict with local Django
+        docker run -d --name factorydash_container --network host -p 8001:8000 factorydash  # Use port 8001 on the host to avoid conflict with local Django
 
     - name: Wait for Docker container to be ready
       run: |
@@ -82,6 +85,10 @@ jobs:
     - name: Check Docker container status
       run: |
         docker ps -a
+
+    - name: Check PostgreSQL service status
+      run: |
+        docker exec -it factorydash_container bash -c "pg_isready -h localhost -p 5433 -U factorydash"
 
     - name: Run Celery worker
       run: |
@@ -97,4 +104,4 @@ jobs:
 
     - name: Run pytest in Docker container
       run: |
-        docker exec -it factorydash_container bash -c "cd /factorydash/app/factorydash && pytest factorydash"
+        docker exec -it factorydash_container bash -c "cd /factorydash/app/factorydash && pytest"
