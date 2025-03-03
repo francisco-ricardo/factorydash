@@ -1,6 +1,6 @@
 # settings_test.py (for pytest)
-
-from .settings import *
+import os
+from factorydash.settings import *
 
 DEBUG = True
 
@@ -15,9 +15,7 @@ DATABASES = {
     }
 }
 
-CELERY_BROKER_URL = "redis://localhost:6380/0"
-CELERY_RESULT_BACKEND = "redis://localhost:6380/0"
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6380/0')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://localhost:6380/0')
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
-
-# EOF
