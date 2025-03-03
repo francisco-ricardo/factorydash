@@ -1,3 +1,5 @@
+import factorydash  # This will set up the Django environment and logging
+
 import pytest
 from unittest.mock import patch
 from monitoring.tasks import cleanup_task

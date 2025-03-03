@@ -1,3 +1,5 @@
+import factorydash  # This will set up the Django environment and logging
+
 import pytest
 from monitoring.models import MachineData
 from django.utils.timezone import now

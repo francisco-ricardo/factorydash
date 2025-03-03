@@ -1,3 +1,5 @@
+import factorydash  # This will set up the Django environment and logging
+
 import pytest
 from django.core.management import call_command
 from monitoring.models import MachineData
