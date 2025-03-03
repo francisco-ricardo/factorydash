@@ -19,6 +19,8 @@ services:
       - DATABASE_URL=postgres://factorydash:factorydash@db:5432/factorydash
       - CELERY_BROKER_URL=redis://redis:6379/0
       - PYTHONPATH=/factorydash/app/factorydash
+      - PYTHONDONTWRITEBYTECODE 1
+      - PYTHONUNBUFFERED 1
       - DJANGO_SETTINGS_MODULE=factorydash.settings
     depends_on:
       - db  # Ensure db is started before factorydash.dev

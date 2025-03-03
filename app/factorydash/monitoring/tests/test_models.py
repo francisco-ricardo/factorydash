@@ -12,8 +12,10 @@ def test_machine_data_creation():
         name="TestEvent",
         value="Running"
     )
+    assert MachineData.objects.count() == 1
     assert data.id is not None
     assert data.data_type == "Events"
     assert data.name == "TestEvent"
+    assert data.value == "Running"
 
 # EOF
