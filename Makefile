@@ -32,6 +32,11 @@ downci:
 	docker rm -f act-CI-CD-Pipeline-build-c6acc847991b86805ff6747e2b9238b1d9a97e-63ceb2838de5c49907a7832497a5db298423481b480ab74924db8238358e1ef7 || true
 	docker rm -f act-CI-CD-Pipeline-build-c6acc847991b86805ff6747e2b9238b1d9a97e-b3da62385a9ffa4fbc37a8c89c6048d2bbf805a8f711d0937c9bdf84cd918a45 || true
 	docker rm -f act-CI-CD-Pipeline-build-c6acc847991b86805ff6747e2b9238b1d9a97ef200e170b447ad993dc518506a || true
+	docker rm -f factorydash-postgres-1 || true
+	docker rm -f factorydash-redis-1 || true
+	docker rm -f factorydash || true
+	docker rm -f factorydash.postgres || true
+	docker rm -f factorydash.redis || true
 
 
 # target: help - Displays the available executable targets

@@ -2,13 +2,31 @@ version: "3.8"
 services:
   postgres:
     image: postgres:latest
+    container_name: factorydash.postgres
     environment:
       POSTGRES_DB: factorydash
       POSTGRES_USER: factorydash
       POSTGRES_PASSWORD: factorydash
     ports:
       - "5432:5432"
+
   redis:
     image: redis:latest
+    container_name: factorydash.redis
     ports:
       - "6379:6379"
+
+  factorydash:
+    image: factorydash
+    container_name: factorydash
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgres://factorydash:factorydash@db:5432/factorydash
+      CELERY_BROKER_URL: redis://redis:6379/0
+      DJANGO_SETTINGS_MODULE: factorydash.settings
+
