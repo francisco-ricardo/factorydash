@@ -290,13 +290,36 @@ celery -A factorydash beat --loglevel=info
   python manage.py loaddata
 
 
+
+Here's an ASCII diagram that describes the integration between Django, Celery, Redis, and PostgreSQL in your project:
+
+```
 +-------------------+       +-------------------+       +-------------------+
 |                   |       |                   |       |                   |
-|      Django       |       |      Celery       |       |    PostgreSQL     |
+|    PostgreSQL     |       |       Redis       |       |      Celery       |
 |                   |       |                   |       |                   |
-|  - Web Framework  |       |  - Task Queue     |       |  - Database       |
-|  - Models         |       |  - Task Scheduler |       |                   |
-|  - Views          |       |                   |       |                   |
-|  - Management     |       |                   |       |                   |
-|    Commands       |       |                   |       |                   |
+|  - Stores data    |       |  - Message broker |       |  - Task queue     |
+|  - Database       |       |  - Caching        |       |  - Background     |
+|                   |       |                   |       |    task execution |
 +---------+---------+       +---------+---------+       +---------+---------+
+          |                           |                           |
+          |                           |                           |
+          |                           |                           |
+          |                           |                           |
+          |                           |                           |
++---------v---------+       +---------v---------+       +---------v---------+
+|                   |       |                   |       |                   |
+|      Django       |       |     Celery        |       |    Celery Worker  |
+|                   |       |     Beat          |       |                   |
+|  - Web framework  |       |  - Periodic tasks |       |  - Executes tasks |
+|  - ORM            |       |                   |       |                   |
+|                   |       |                   |       |                   |
++-------------------+       +-------------------+       +-------------------+
+```
+
+Explanation:
+- **PostgreSQL**: The database where Django stores its data.
+- **Redis**: Acts as a message broker for Celery and also provides caching.
+- **Django**: The web framework that interacts with PostgreSQL for data storage and uses Celery for background task execution.
+- **Celery**: Manages the task queue and schedules periodic tasks using Celery Beat.
+- **Celery Worker**: Executes the tasks that are queued by Celery.

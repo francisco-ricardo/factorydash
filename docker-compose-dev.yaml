@@ -27,7 +27,7 @@ services:
       - redis # Ensure redis is started before factorydash.dev
 
   celery_worker:
-    container_name: factorydash.celery_worker
+    container_name: factorydash.celery_worker.dev
     image: factorydash.dev:latest
     restart: always
     command: celery -A factorydash worker --loglevel=info
@@ -42,7 +42,7 @@ services:
       - DJANGO_SETTINGS_MODULE=factorydash.settings      
 
   celery_beat:
-    container_name: factorydash.celery_beat
+    container_name: factorydash.celery_beat.dev
     image: factorydash.dev:latest
     restart: always
     command: celery -A factorydash beat --loglevel=info
@@ -57,7 +57,7 @@ services:
       - DJANGO_SETTINGS_MODULE=factorydash.settings      
 
   db:
-    container_name: factorydash.db
+    container_name: factorydash.postgres.dev
     image: postgres:latest
     restart: always
     environment:
@@ -70,7 +70,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   redis:
-    container_name: factorydash.redis
+    container_name: factorydash.redis.dev
     image: redis:latest
     restart: always
     ports:
