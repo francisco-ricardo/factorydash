@@ -323,3 +323,16 @@ Explanation:
 - **Django**: The web framework that interacts with PostgreSQL for data storage and uses Celery for background task execution.
 - **Celery**: Manages the task queue and schedules periodic tasks using Celery Beat.
 - **Celery Worker**: Executes the tasks that are queued by Celery.
+
+
+
+Docker hub
+
+Access token description:
+dockerhub access token for factorydash
+
+Personal Acces Token:
+dckr_pat_299uUmwXM1jM_dKPvdq88OLRyM4
+
+docker login -u franciscoricardodev
+put the personal acces token

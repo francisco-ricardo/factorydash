@@ -21,7 +21,7 @@ ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 
 # Copy project
-COPY . /factorydash/
+COPY . .
 
 # Ensure logs directory exists
 RUN mkdir -p /factorydash/app/factorydash/logs
