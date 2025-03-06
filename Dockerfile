@@ -7,10 +7,8 @@ WORKDIR /factorydash
 # Install system dependencies
 RUN apt update && apt install -y \
     curl \
-    openssh-client \
     postgresql-client \
     locales \
-    iputils-ping \
     && rm -rf /var/lib/apt/lists/*
 
 # Set up locale correctly
