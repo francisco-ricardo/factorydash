@@ -10,13 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
-    env:
-      DATABASE_URL: postgres://factorydash:factorydash@postgres:5432/factorydash
-      CELERY_BROKER_URL: redis://factorydash.redis:6379/0
-      CELERY_RESULT_BACKEND: redis://factorydash.redis:6379/0
-      DJANGO_SETTINGS_MODULE: factorydash.settings
+    runs-on: ubuntu-latest    
 
     steps:
       - name: Checkout code
@@ -42,6 +36,7 @@ jobs:
         run: |
           docker rm -f factorydash.postgres || true
           docker rm -f factorydash.redis || true
+          docker rm -f factorydash || true
 
       - name: Start services
         run: docker compose up -d
@@ -53,14 +48,6 @@ jobs:
         run: |
           docker build -t factorydash .
 
-      - name: Remove existing Docker container if exists
-        run: |
-          docker rm -f factorydash || true
-
-      - name: Run Docker container
-        run: |
-          docker run -d --name factorydash -p 8000:8000 factorydash
-
       - name: Wait for Docker container to be ready
         run: |
           sleep 10 # Wait for the container to be fully up and running
@@ -68,37 +55,33 @@ jobs:
       - name: Wait for PostgreSQL to be ready inside Docker
         run: |
           echo "Waiting for PostgreSQL to be ready..."
-          for i in {1..30}; do  # Try for up to 60 seconds
+          for i in {1..10}; do
             if docker exec factorydash.postgres pg_isready -U factorydash; then
               echo "PostgreSQL is ready!"
               exit 0
             fi
-            echo "PostgreSQL not ready yet, retrying in 2s..."
-            sleep 2
+            echo "PostgreSQL not ready yet, retrying in 3s..."
+            sleep 3
           done
           echo "PostgreSQL did not become ready in time"
-          docker logs factorydash.postgres  # Show PostgreSQL logs for debugging
-          exit 1  # Fail the pipeline if PostgreSQL doesn't start
-
-      - name: Check PostgreSQL Service Status
-        run: docker exec -it factorydash.postgres bash -c "PGUSER=factorydash pg_isready -h factorydash.postgres -p 5432"
+          docker logs factorydash.postgres
+          exit 1
 
       - name: Run migrations in Docker container
         run: |
-          until docker exec factorydash.postgres pg_isready -h factorydash.postgres -p 5432 -U factorydash; do
-            echo "Waiting for PostgreSQL to be ready..."
+          echo "Waiting for PostgreSQL to be ready..."
+          for i in {1..10}; do
+            if docker exec factorydash.postgres pg_isready -U factorydash -p 5432; then
+              echo "PostgreSQL is ready, running migrations..."
+              docker exec -it factorydash bash -c "cd /factorydash/app/factorydash && python manage.py migrate"
+              exit 0
+            fi
+            echo "PostgreSQL not ready yet, retrying in 3s..."
             sleep 3
           done
-          echo "PostgreSQL is ready, running migrations..."
-          docker exec -it factorydash bash -c "cd /factorydash/app/factorydash && python manage.py migrate"
-
-      - name: Run tests in Docker container
-        run: |
-          docker exec -it factorydash bash -c "cd /factorydash/app/factorydash && python manage.py test"
-
-      - name: Run pytest in Docker container
-        run: |
-          docker exec -it factorydash bash -c "cd /factorydash/app/factorydash && pytest"
+          echo "PostgreSQL did not become ready in time"
+          docker logs factorydash.postgres
+          exit 1
 
       - name: Run Celery worker
         run: |
@@ -107,6 +90,10 @@ jobs:
       - name: Run Celery beat
         run: |
           docker exec -d factorydash celery -A factorydash beat --loglevel=info
+
+      - name: Run pytest in Docker container
+        run: |
+          docker exec -it factorydash bash -c "cd /factorydash/app/factorydash && pytest"          
 
       - name: Check Docker container status
         run: |
