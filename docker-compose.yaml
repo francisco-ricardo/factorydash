@@ -25,6 +25,8 @@ services:
       POSTGRES_DB: factorydash
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   redis:
     container_name: factorydash.redis
@@ -32,5 +34,7 @@ services:
     ports:
       - "6379:6379"
 
+volumes:
+  postgres_data:
 
 

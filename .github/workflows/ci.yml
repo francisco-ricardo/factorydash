@@ -26,6 +26,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Run Pytest Before Building Docker Image
+        run: |
+          pytest  
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -45,10 +49,7 @@ jobs:
           docker rm -f factorydash || true
 
       - name: Start services
-        run: docker compose up -d
-
-      - name: Check PostgreSQL Logs
-        run: docker logs factorydash.postgres
+        run: docker compose up -d      
 
       - name: Build Docker container
         run: |
@@ -58,10 +59,14 @@ jobs:
         run: |
           sleep 10 # Wait for the container to be fully up and running
 
+      - name: Run pytest in Docker container
+        run: |
+          docker exec -it factorydash bash -c "cd /factorydash/app/factorydash && pytest"                  
+
       - name: Wait for PostgreSQL to be ready inside Docker
         run: |
           echo "Waiting for PostgreSQL to be ready..."
-          for i in {1..10}; do
+          for i in {1..15}; do
             if docker exec factorydash.postgres pg_isready -U factorydash; then
               echo "PostgreSQL is ready!"
               exit 0
@@ -75,19 +80,7 @@ jobs:
 
       - name: Run migrations in Docker container
         run: |
-          echo "Waiting for PostgreSQL to be ready..."
-          for i in {1..10}; do
-            if docker exec factorydash.postgres pg_isready -U factorydash -p 5432; then
-              echo "PostgreSQL is ready, running migrations..."
-              docker exec -it factorydash bash -c "cd /factorydash/app/factorydash && python manage.py migrate"
-              exit 0
-            fi
-            echo "PostgreSQL not ready yet, retrying in 3s..."
-            sleep 3
-          done
-          echo "PostgreSQL did not become ready in time"
-          docker logs factorydash.postgres
-          exit 1
+          docker exec -it factorydash bash -c "cd /factorydash/app/factorydash && python manage.py migrate"
 
       - name: Run Celery worker
         run: |
@@ -97,6 +90,4 @@ jobs:
         run: |
           docker exec -d factorydash celery -A factorydash beat --loglevel=info
 
-      - name: Run pytest in Docker container
-        run: |
-          docker exec -it factorydash bash -c "cd /factorydash/app/factorydash && pytest"
+      
