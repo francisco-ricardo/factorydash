@@ -1,12 +1,11 @@
 # Use Python official image
-FROM python:latest
+FROM python:3.13.2-slim
 
 # Set the working directory inside the container
 WORKDIR /factorydash
 
 # Install system dependencies
 RUN apt update && apt install -y \
-    curl \
     postgresql-client \
     locales \
     && rm -rf /var/lib/apt/lists/*
@@ -19,16 +18,24 @@ RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
 # Set environment variables
 ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
+ENV PYTHONPATH /factorydash/app/factorydash
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Install Django dependencies
+COPY requirements.txt ./
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy project
 COPY . .
 
-# Ensure logs directory exists
+# Create log directory
 RUN mkdir -p /factorydash/app/factorydash/logs
-
-# Install Django dependencies
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r /factorydash/requirements.txt
 
 # Run the Django development server
 CMD ["python", "/factorydash/app/factorydash/manage.py", "runserver", "0.0.0.0:8000"]
+
+# Health check example (adjust as needed)
+#HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    #CMD curl -f http://0.0.0.0:8000/ || exit 1

@@ -65,7 +65,6 @@ coverage.xml
 
 
 tmp/
-#app/factorydash/logs/*
 logs/
 
 # Ignore Celery beat schedule files
@@ -73,3 +72,7 @@ celerybeat-schedule
 celerybeat-schedule.*
 celerybeat-schedule-shm
 celerybeat-schedule-wal
+
+# Ignore local environment files
+.env
+.env.*

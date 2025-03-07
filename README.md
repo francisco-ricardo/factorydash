@@ -284,6 +284,7 @@ celery -A factorydash beat --loglevel=info
   python manage.py cleanup
   
   act -j build
+  act -j build --env-file .env
 
 
   TODO: IMPLEMENTAR data_loader como Command:
