@@ -33,6 +33,9 @@ COPY . .
 # Create log directory
 RUN mkdir -p /factorydash/app/factorydash/logs
 
+# Expose the application port
+EXPOSE 8000
+
 # Run the Django development server
 CMD ["python", "/factorydash/app/factorydash/manage.py", "runserver", "0.0.0.0:8000"]
 
