@@ -49,11 +49,15 @@ jobs:
 
       - name: Build Docker container
         run: |
-          docker build -t factorydash .
+          docker build -t factorydash .      
 
       - name: Run pytest in Docker container
         run: |
           docker exec -it factorydash bash -c "cd /factorydash/app/factorydash && pytest"
+
+      - name: Check the integrity of the Django project in Docker container
+        run: |
+          docker exec -it factorydash bash -c "cd /factorydash/app/factorydash && python manage.py check"          
 
       - name: Run migrations in Docker container
         run: |

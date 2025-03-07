@@ -37,7 +37,8 @@ RUN mkdir -p /factorydash/app/factorydash/logs
 EXPOSE 8000
 
 # Run the Django development server
-CMD ["python", "/factorydash/app/factorydash/manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["gunicorn", "--chdir", "app/factorydash", "--bind", "0.0.0.0:8000", "factorydash.wsgi:application"]
+
 
 # Health check example (adjust as needed)
 #HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \

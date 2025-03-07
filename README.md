@@ -337,3 +337,127 @@ dckr_pat_299uUmwXM1jM_dKPvdq88OLRyM4
 
 docker login -u franciscoricardodev
 put the personal acces token
+
+
+
+## TODO
+
+1. Prepare for Railway.app Deployment:
+
+Remove Local Specifics.
+
+- In docker-compose.yaml:
+  - [] remove port mappings (e.g., 5432:5432). Railway handles this.
+  - [] Remove the volumes section. Railway provides its own persistent storage.
+  - [] Remove the container_name lines, railway will create them.
+
+Production WSGI Server.
+
+- [x] In your Dockerfile, replace the CMD instruction with Gunicorn or Uvicorn. Gunicorn is a popular choice for Django.
+Example: CMD ["gunicorn", "factorydash.wsgi:application", "--bind", "0.0.0.0:8000"]
+Install gunicorn in the requirements.txt file.
+
+Production Settings.
+
+- [x] In settings.py, set DEBUG = False for production.
+- [] Configure ALLOWED_HOSTS to allow requests from Railway.app. 
+You can use ALLOWED_HOSTS = ['*'] for now (but consider more specific hosts in production).
+- [] Make sure that the secret key is retrieved from the environment variables.
+- [] Make sure that the database url is retrieved from the environment variables.
+- [] Make sure that the celery broker url is retrieved from the environment variables.
+
+2. Configure Railway.app:
+
+Create a Railway.app Project:
+- [] Sign up for Railway.app.
+- [] Create a new project.
+- [] Link GitHub Repository: Connect your GitHub repository to your Railway.app project.
+- [] Add Services:
+PostgreSQL:
+Add a PostgreSQL service from the Railway.app marketplace.
+Redis:
+Add a Redis service from the Railway.app marketplace.
+Django App:
+Railway will automatically detect your Dockerfile.
+
+Environment Variables:
+- [] In Railway.app's settings, add the following environment variables:
+SECRET_KEY: Generate a strong secret key.
+DATABASE_URL: Railway.app will automatically provide this from the PostgreSQL service.
+CELERY_BROKER_URL: Railway.app will automatically provide this from the Redis service.
+DJANGO_SETTINGS_MODULE: Set this to factorydash.settings.
+ALLOWED_HOSTS: Set this to * for testing, or your specific hostnames.
+RAILWAY_ENVIRONMENT: set this to production.
+
+Configure the start command:
+- [] In the railway settings, configure the start command to be gunicorn factorydash.wsgi:application --bind 0.0.0.0:8000
+
+3. CI/CD Pipeline (ci.yml):
+
+Build and Push Docker Image:
+- [] Modify your ci.yml to build and push your Docker image to a container registry (Docker Hub or Railway's registry).
+Here is an example of the docker build and push.
+```yaml
+
+- name: Build and push Docker image
+  uses: docker/build-push-action@v4
+  with:
+    context: .
+    push: true
+    tags: ${{ secrets.DOCKER_USERNAME }}/factorydash:${{ github.sha }}
+```
+
+- [] Modify the docker compose file to use the new image tag.
+Example: `image: ${{ secrets.DOCKER_USERNAME }}/factorydash:${{ github.sha }}`
+
+Remove Docker Compose:
+
+- [] Remove the steps that use docker compose, they are not needed in railway.
+
+Run Migrations:
+- [] Add a step to run migrations after the image is pushed.
+This step can be done in the railway settings, as a start command.
+Example: `python manage.py migrate`
+
+Run Celery:
+- [] Add two new services in railway, one for the celery worker, and one for the celery beat.
+Configure the start commands to be:
+Celery worker: celery -A factorydash worker --loglevel=info
+Celery beat: celery -A factorydash beat --loglevel=info
+
+Health Checks:
+- [] Add a health check to the Dockerfile.
+Example: HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD curl -f http://0.0.0.0:8000/ || exit 1
+
+4. Code Changes:
+
+-[] settings.py:
+Update settings.py to use environment variables for sensitive settings.
+Example of the docker-compose.yaml file:
+
+```yaml
+services:
+  factorydash:
+    image: ${{ secrets.DOCKER_USERNAME }}/factorydash:${{ github.sha }}
+    environment:
+      - DJANGO_SETTINGS_MODULE=factorydash.settings
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+  postgres:
+    image: postgres:latest
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "factorydash"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  redis:
+    image: redis:latest
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+```
