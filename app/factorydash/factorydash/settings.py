@@ -16,20 +16,61 @@ from pathlib import Path
 
 import os
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 from logging.handlers import RotatingFileHandler
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-IS_PRODUCTION = os.getenv("RAILWAY_ENVIRONMENT", "development") == "production"
+RAILWAY_ENVIRONMENT = os.getenv("RAILWAY_ENVIRONMENT", "development")
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-qwba_g+u=^%nl2%p2ih(uzw%jwch6#8r2@z4)nth#e0o1y%mtk'
+SECRET_KEY = os.getenv("SECRET_KEY", 'django-insecure-qwba_g+u=^%nl2%p2ih(uzw%jwch6#8r2@z4)nth#e0o1y%mtk')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False if IS_PRODUCTION else True
+IS_PRODUCTION = (RAILWAY_ENVIRONMENT == "production")
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", '*').split(",")
+
+DEBUG = not IS_PRODUCTION
+
+
+# Database configuration
+
+# Default database configuration for local development (e.g., Docker)
+DEFAULT_DB_CONFIG = {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': 'factorydash',
+    'USER': 'factorydash',
+    'PASSWORD': 'factorydash',
+    'HOST': 'db',
+    'PORT': '5432',
+}
+
+# Get DATABASE_URL from environment, with a fallback to None
+DATABASE_URL = os.getenv('DATABASE_URL')
+
+# Set DATABASES configuration
+try:
+    DATABASES = {
+        'default': (
+            dj_database_url.parse(DATABASE_URL)
+            if DATABASE_URL
+            else DEFAULT_DB_CONFIG
+        )
+    }
+except ValueError as e:
+    raise ImproperlyConfigured(f"Invalid DATABASE_URL: {e}")
+
+# Persist connections for 10 minutes to reduce connection overhead
+DATABASES['default']['CONN_MAX_AGE'] = 600  
+
+# Define the data retention policy
+DATA_RETENTION_DAYS = os.getenv("DATA_RETENTION_DAYS", 2)
+
+
+# Celery configuration
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://redis:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', CELERY_BROKER_URL)
 
 
 # Application definition
@@ -118,25 +159,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Default: Use local PostgreSQL (Docker)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'factorydash',
-        'USER': 'factorydash',
-        'PASSWORD': 'factorydash',
-        'HOST': 'db',  # Matches service name in docker-compose
-        'PORT': '5432',
-    }
-}
 
-# Override for Railway.app (if DATABASE_URL exists)
-DATABASE_URL = os.getenv('DATABASE_URL')
-if DATABASE_URL:
-    DATABASES['default'] = dj_database_url.config(default=DATABASE_URL)
-
-# Define the data retention policy
-DATA_RETENTION_DAYS = 3 if IS_PRODUCTION else 2
 
 # Logging configuration
 
@@ -186,18 +209,4 @@ LOGGING = {
     },
 }
 
-
-# Celery settings
-# CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
-# CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
-# CELERY_ACCEPT_CONTENT = ['json']
-# CELERY_TASK_SERIALIZER = 'json'
-# CELERY_RESULT_SERIALIZER = 'json'
-# CELERY_TIMEZONE = 'UTC'
-
-CELERY_BROKER_URL = "redis://redis:6379/0"
-CELERY_ACCEPT_CONTENT = ["json"]
-CELERY_TASK_SERIALIZER = "json"
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
-CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+# EOF

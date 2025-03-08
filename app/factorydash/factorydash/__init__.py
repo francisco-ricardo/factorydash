@@ -1,17 +1,18 @@
 """
-This module sets up the Django environment, logging, and Celery for the 
-factorydash project.
+This module ensures the Django environment and Celery app are properly initialized
+for the factorydash project.
 
-It ensures that the Django settings are configured, logging is set up, 
-and the Celery app is always imported when Django starts.
+It sets up the Django settings module and makes the Celery app available when
+Django starts, enabling shared_task usage.
 """
 
 from __future__ import absolute_import, unicode_literals
 import os
 import sys
+import logging
 
 
-# Set up Django environment
+# Set up Django environment (only if not already set up)
 if not getattr(sys, '_is_django_setup', False):
     project_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     if project_path not in sys.path:
@@ -24,8 +25,8 @@ if not getattr(sys, '_is_django_setup', False):
 
 
 # Set up logging
-import logging
 logger = logging.getLogger("factorydash")
+logger.info('Django environment initialized')
 
 
 # Set up Celery

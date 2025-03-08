@@ -360,11 +360,12 @@ Install gunicorn in the requirements.txt file.
 Production Settings.
 
 - [x] In settings.py, set DEBUG = False for production.
-- [] Configure ALLOWED_HOSTS to allow requests from Railway.app. 
+- [x] Configure ALLOWED_HOSTS to allow requests from Railway.app. 
 You can use ALLOWED_HOSTS = ['*'] for now (but consider more specific hosts in production).
-- [] Make sure that the secret key is retrieved from the environment variables.
-- [] Make sure that the database url is retrieved from the environment variables.
-- [] Make sure that the celery broker url is retrieved from the environment variables.
+- [x] Make sure that the secret key is retrieved from the environment variables.
+- [x] Make sure that the database url is retrieved from the environment variables.
+- [x] Make sure that the celery broker url is retrieved from the environment variables.
+- [] Review the env vars defined into the Dockerfile. Maybe it is better to move to .env and Railway.app.
 
 2. Configure Railway.app:
 
