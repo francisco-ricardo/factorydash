@@ -8,10 +8,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"    
-    environment:
-      - DATABASE_URL=postgres://factorydash:factorydash@postgres:5432/factorydash
-      - CELERY_BROKER_URL=redis://redis:6379/0 
-      - DJANGO_SETTINGS_MODULE=factorydash.settings
+    env_file:
+      - ./.env.local
     depends_on:
       postgres:
         condition: service_healthy

@@ -18,7 +18,7 @@ RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
 # Set environment variables
 ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
-ENV PYTHONPATH /factorydash/app/factorydash
+#ENV PYTHONPATH /factorydash/app/factorydash
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
