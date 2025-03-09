@@ -365,7 +365,7 @@ You can use ALLOWED_HOSTS = ['*'] for now (but consider more specific hosts in p
 - [x] Make sure that the secret key is retrieved from the environment variables.
 - [x] Make sure that the database url is retrieved from the environment variables.
 - [x] Make sure that the celery broker url is retrieved from the environment variables.
-- [] Review the env vars defined into the Dockerfile. Maybe it is better to move to .env and Railway.app.
+- [x] Review the env vars defined into the Dockerfile. Maybe it is better to move to .env and Railway.app.
 
 2. Configure Railway.app:
 
@@ -388,7 +388,7 @@ DATABASE_URL: Railway.app will automatically provide this from the PostgreSQL se
 CELERY_BROKER_URL: Railway.app will automatically provide this from the Redis service.
 DJANGO_SETTINGS_MODULE: Set this to factorydash.settings.
 ALLOWED_HOSTS: Set this to * for testing, or your specific hostnames.
-RAILWAY_ENVIRONMENT: set this to production.
+RAILWAY_ENVIRONMENT_NAME: set this to production.
 
 Configure the start command:
 - [] In the railway settings, configure the start command to be gunicorn factorydash.wsgi:application --bind 0.0.0.0:8000

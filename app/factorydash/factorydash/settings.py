@@ -23,11 +23,11 @@ from logging.handlers import RotatingFileHandler
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-RAILWAY_ENVIRONMENT = os.getenv("RAILWAY_ENVIRONMENT", "development")
+RAILWAY_ENVIRONMENT_NAME = os.getenv("RAILWAY_ENVIRONMENT_NAME", "development")
 
 SECRET_KEY = os.getenv("SECRET_KEY", 'django-insecure-qwba_g+u=^%nl2%p2ih(uzw%jwch6#8r2@z4)nth#e0o1y%mtk')
 
-IS_PRODUCTION = (RAILWAY_ENVIRONMENT == "production")
+IS_PRODUCTION = (RAILWAY_ENVIRONMENT_NAME == "production")
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", '*').split(",")
 
