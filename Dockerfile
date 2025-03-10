@@ -1,45 +1,37 @@
-# Use Python official image
 FROM python:3.13.2-slim
 
-# Set the working directory inside the container
 WORKDIR /factorydash
 
-# Install system dependencies
-RUN apt update && apt install -y \
+# Install dependencies
+RUN apt-get update && apt-get install -y \
     postgresql-client \
     locales \
+    supervisor \
     && rm -rf /var/lib/apt/lists/*
 
-# Set up locale correctly
+# Set up locale
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen && \
     update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 
-# Set environment variables
-ENV LANG en_US.UTF-8
-ENV LC_ALL en_US.UTF-8
-#ENV PYTHONPATH /factorydash/app/factorydash
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
-# Install Django dependencies
-COPY requirements.txt ./
+COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy project
 COPY . .
 
-# Create log directory
-RUN mkdir -p /factorydash/app/factorydash/logs
+RUN mkdir -p /factorydash/app/factorydash/logs && \
+    python app/factorydash/manage.py collectstatic --noinput
 
-# Expose the application port
 EXPOSE 8000
 
-# Run the Django development server
-CMD ["gunicorn", "--chdir", "app/factorydash", "--bind", "0.0.0.0:8000", "factorydash.wsgi:application"]
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+CMD ["sh", "-c", "python app/factorydash/manage.py migrate && supervisord -c /etc/supervisor/conf.d/supervisord.conf"]
 
 
-# Health check example (adjust as needed)
-#HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    #CMD curl -f http://0.0.0.0:8000/ || exit 1
+# EOF

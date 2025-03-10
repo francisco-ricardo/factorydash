@@ -1,4 +1,67 @@
+
 TODO:
+
+
+- [] Confirmar com o grok o path do log dir
+
+- [] Rotacionar os logs do suporvisor no railway.app
+
+- [] Definir as variáveis de ambiente no Railway
+  - Set in Dashboard under factorydash Service
+DJANGO_SETTINGS_MODULE=factorydash.settings
+PYTHONPATH=/factorydash/app/factorydash
+RAILWAY_ENVIRONMENT_NAME=production
+SECRET_KEY=your-secure-key-here  # Generate with python -c "import secrets; print(secrets.token_urlsafe(50))"
+ALLOWED_HOSTS=your-railway-domain
+LOAD_NIST_DATA_SCHEDULE_SECONDS=60
+DATA_RETENTION_DAYS=2
+DATABASE_URL=${{Postgres.DATABASE_URL}}
+CELERY_BROKER_URL=${{Redis.REDIS_URL}}
+CELERY_RESULT_BACKEND=${{Redis.REDIS_URL}}  
+
+- [] Definir as variáveis de ambiente no Github Secrets
+  - Repository > Settings > Secrets and Variables > Actions
+DOCKER_USERNAME=xxxxx
+DOCKER_PASSWORD=xxxxxx
+RAILWAY_TOKEN=xxxxxx  
+
+- [] Testar deployment
+
+  - Add supervisord.conf to your project root.
+  - Update requirements.txt with all listed dependencies.
+  - Commit all files to your GitHub repo.
+  - Set Up GitHub Secrets:
+    - Go to repo > Settings > Secrets and Variables > Actions.
+    - Add DOCKER_USERNAME, DOCKER_PASSWORD, RAILWAY_TOKEN (from Railway dashboard > Account > Tokens).
+  - Set Up Railway:
+    - Create a new project and service named factorydash.
+    - Link to your GitHub repo.
+    - Add PostgreSQL and Redis services.
+    - Set the Railway variables above.
+  - Deploy:
+    - Push to main. Workflow will:
+      - Run manage.py check to validate settings.
+      - Run pytest to test logic.
+      - Build and push Docker image.
+      - Deploy to Railway, where migrate runs before starting services.
+  - Local Testing:
+    - Run docker compose up --build with .env.local to test locally.
+
+- Notes
+  - Testing: check and pytest use SQLite in CI for speed; migrations use the real database on Railway.
+  - Celery: All processes (web, worker, Beat) run via supervisord in one container on Railway.
+  - Security: Replace SECRET_KEY placeholders with a secure value in Railway.
+  - These files should now fully cover your requirements. Let me know if you need clarification or run into issues!
+
+
+
+
+
+
+
+
+
+
 
 Streams: A set of Samples, Events, or Conditon for components and devices.
 
@@ -462,3 +525,615 @@ services:
       timeout: 5s
       retries: 5
 ```
+
+
+Railway Postgres
+DATABASE_URL: postgresql://postgres:UMCovcRQdvJmtDbzSKtboJZCwWRMljuP@postgres.railway.internal:5432/railway
+
+Railway Redis
+REDIS_URL: redis://default:OTsZJsoQHTwJJZDtkmhswebDIcFgZLOh@redis.railway.internal:6379
+
+
+New instructions:
+
+Updated Files
+1. .github/workflows/deploy.yml
+This workflow includes testing (pytest), validation (manage.py check), and deployment to Railway, with migrations handled during deployment.
+
+yaml
+
+Collapse
+
+Wrap
+
+Copy
+name: Deploy to Railway
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13.2'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-django
+
+      - name: Run Django Check
+        env:
+          DJANGO_SETTINGS_MODULE: factorydash.settings_test
+          DATABASE_URL: sqlite:///test.db
+        run: |
+          python app/factorydash/manage.py check --settings=factorydash.settings_test
+
+      - name: Run Pytest
+        env:
+          DJANGO_SETTINGS_MODULE: factorydash.settings_test
+          DATABASE_URL: sqlite:///test.db
+          CELERY_BROKER_URL: redis://localhost:6379/0
+          CELERY_RESULT_BACKEND: redis://localhost:6379/0
+          LOAD_NIST_DATA_SCHEDULE_SECONDS: 60
+          DATA_RETENTION_DAYS: 2
+        run: |
+          pytest --verbose
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Tag Docker Image
+        run: |
+          docker build -t franciscoricardodev/factorydash:latest .
+          docker tag franciscoricardodev/factorydash:latest franciscoricardodev/factorydash:${{ github.sha }}
+
+      - name: Push Docker Image to Docker Hub
+        run: |
+          docker push franciscoricardodev/factorydash:latest
+          docker push franciscoricardodev/factorydash:${{ github.sha }}
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: railway up --service factorydash --environment production
+2. settings.py
+python
+
+Collapse
+
+Wrap
+
+Copy
+"""
+Django settings for factorydash project.
+"""
+
+from pathlib import Path
+import os
+import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
+
+# Build paths
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Environment and Security
+RAILWAY_ENVIRONMENT_NAME = os.getenv("RAILWAY_ENVIRONMENT_NAME", "development")
+IS_PRODUCTION = (RAILWAY_ENVIRONMENT_NAME == "production")
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY and not IS_PRODUCTION:
+    SECRET_KEY = 'django-insecure-qwba_g+u=^%nl2%p2ih(uzw%jwch6#8r2@z4)nth#e0o1y%mtk'
+elif not SECRET_KEY:
+    raise ImproperlyConfigured("SECRET_KEY must be set in production")
+DEBUG = not IS_PRODUCTION
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
+
+# Database configuration
+DEFAULT_DB_CONFIG = {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': 'factorydash',
+    'USER': 'factorydash',
+    'PASSWORD': 'factorydash',
+    'HOST': 'postgres',
+    'PORT': '5432',
+}
+DATABASE_URL = os.getenv('DATABASE_URL')
+try:
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL) if DATABASE_URL else DEFAULT_DB_CONFIG
+    }
+except ValueError as e:
+    raise ImproperlyConfigured(f"Invalid DATABASE_URL: {e}")
+DATABASES['default']['CONN_MAX_AGE'] = 600
+
+# Data retention
+DATA_RETENTION_DAYS = int(os.getenv("DATA_RETENTION_DAYS", "2"))
+
+# Celery configuration
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://redis:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', CELERY_BROKER_URL)
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+# Application definition
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'monitoring',
+    'django_celery_beat',
+]
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'factorydash.urls'
+WSGI_APPLICATION = 'factorydash.wsgi.application'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+# Password validation
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
+# Internationalization
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_TZ = True
+
+# Static files
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Logging
+LOGS_DIR = BASE_DIR / 'logs'
+LOGS_DIR.mkdir(exist_ok=True)
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {"format": "{asctime} [{levelname}] {module} - {message}", "style": "{"},
+        "simple": {"format": "[{levelname}] {message}", "style": "{"},
+    },
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOGS_DIR / "factorydash.log",
+            "maxBytes": 5 * 1024 * 1024,
+            "backupCount": 3,
+            "formatter": "verbose",
+        },
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+    },
+    "loggers": {
+        "django": {"handlers": ["file", "console"], "level": "INFO", "propagate": True},
+        "factorydash": {"handlers": ["file", "console"], "level": "DEBUG", "propagate": False},
+    },
+}
+3. settings_test.py
+python
+
+Collapse
+
+Wrap
+
+Copy
+# settings_test.py (for pytest)
+from .settings import *
+
+DEBUG = True
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+    }
+}
+
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = True
+4. celery.py
+python
+
+Collapse
+
+Wrap
+
+Copy
+import os
+from celery import Celery
+from celery.schedules import crontab
+from urllib.parse import urlparse
+
+# Default broker and backend URLs
+DEFAULT_CELERY_BROKER_URL = 'redis://redis:6379/0'
+DEFAULT_CELERY_RESULT_BACKEND = DEFAULT_CELERY_BROKER_URL
+
+# Fetch and validate broker URLs
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', DEFAULT_CELERY_BROKER_URL)
+if not CELERY_BROKER_URL:
+    raise ValueError("CELERY_BROKER_URL must be set to a valid broker URL")
+try:
+    parsed_url = urlparse(CELERY_BROKER_URL)
+    if not parsed_url.scheme or not parsed_url.netloc:
+        raise ValueError("CELERY_BROKER_URL must be a valid URL (e.g., redis://host:port)")
+except ValueError as e:
+    raise ValueError(f"Invalid CELERY_BROKER_URL: {e}")
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', DEFAULT_CELERY_RESULT_BACKEND)
+
+# Fetch and validate LOAD_NIST_DATA_SCHEDULE_SECONDS
+DEFAULT_LOAD_NIST_DATA_SCHEDULE_SECONDS = 60.0
+LOAD_NIST_DATA_SCHEDULE_SECONDS = os.getenv('LOAD_NIST_DATA_SCHEDULE_SECONDS', str(DEFAULT_LOAD_NIST_DATA_SCHEDULE_SECONDS))
+try:
+    LOAD_NIST_DATA_SCHEDULE_SECONDS = float(LOAD_NIST_DATA_SCHEDULE_SECONDS)
+    if LOAD_NIST_DATA_SCHEDULE_SECONDS <= 0:
+        raise ValueError("LOAD_NIST_DATA_SCHEDULE_SECONDS must be a positive number")
+except ValueError as e:
+    raise ValueError(f"Invalid LOAD_NIST_DATA_SCHEDULE_SECONDS: {e}")
+
+# Initialize Celery
+app = Celery("factorydash")
+app.config_from_object("django.conf:settings", namespace="CELERY")
+app.conf.update(
+    broker_url=CELERY_BROKER_URL,
+    result_backend=CELERY_RESULT_BACKEND,
+    accept_content=['json'],
+    task_serializer='json',
+    result_serializer='json',
+    timezone='UTC',
+    broker_connection_retry_on_startup=True,
+    broker_connection_retry=True,
+    broker_connection_max_retries=5,
+    task_track_started=True,
+    result_expires=3600,
+)
+
+# Auto-discover tasks
+app.autodiscover_tasks()
+
+# Celery Beat schedule
+app.conf.beat_schedule = {
+    "load_nist_data_task_every_interval": {
+        "task": "monitoring.tasks.load_nist_data_task",
+        "schedule": LOAD_NIST_DATA_SCHEDULE_SECONDS,
+    },
+    "cleanup_old_data_daily_midday": {
+        "task": "monitoring.tasks.cleanup_task",
+        "schedule": crontab(hour=12, minute=5),
+    },
+    "cleanup_old_data_daily_midnight": {
+        "task": "monitoring.tasks.cleanup_task",
+        "schedule": crontab(hour=0, minute=5),
+    },
+}
+5. factorydash/__init__.py
+python
+
+Collapse
+
+Wrap
+
+Copy
+"""
+This module ensures the Django environment and Celery app are properly initialized
+for the factorydash project.
+"""
+
+from __future__ import absolute_import, unicode_literals
+import os
+import sys
+import logging
+
+# Set up Django environment
+if not getattr(sys, '_is_django_setup', False):
+    project_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if project_path not in sys.path:
+        sys.path.append(project_path)
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "factorydash.settings")
+    import django
+    django.setup()
+    sys._is_django_setup = True
+
+# Set up logging
+logger = logging.getLogger("factorydash")
+logger.info('Django environment initialized')
+
+# Set up Celery
+from .celery import app as celery_app
+__all__ = ('celery_app',)
+6. Dockerfile
+dockerfile
+
+Collapse
+
+Wrap
+
+Copy
+FROM python:3.13.2-slim
+
+WORKDIR /factorydash
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    locales \
+    supervisor \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up locale
+RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    locale-gen && \
+    update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+
+ENV LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+COPY requirements.txt .
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+RUN mkdir -p /factorydash/logs && \
+    python app/factorydash/manage.py collectstatic --noinput
+
+EXPOSE 8000
+
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+CMD ["sh", "-c", "python app/factorydash/manage.py migrate && supervisord -c /etc/supervisor/conf.d/supervisord.conf"]
+7. supervisord.conf
+ini
+
+Collapse
+
+Wrap
+
+Copy
+[supervisord]
+nodaemon=true
+logfile=/factorydash/logs/supervisord.log
+pidfile=/tmp/supervisord.pid
+
+[program:gunicorn]
+command=gunicorn --chdir app/factorydash --bind 0.0.0.0:8000 factorydash.wsgi:application
+stdout_logfile=/factorydash/logs/gunicorn.log
+stderr_logfile=/factorydash/logs/gunicorn_err.log
+autorestart=true
+
+[program:celery_worker]
+command=celery -A factorydash worker --loglevel=info
+directory=/factorydash/app/factorydash
+stdout_logfile=/factorydash/logs/celery_worker.log
+stderr_logfile=/factorydash/logs/celery_worker_err.log
+autorestart=true
+
+[program:celery_beat]
+command=celery -A factorydash beat --loglevel=info
+directory=/factorydash/app/factorydash
+stdout_logfile=/factorydash/logs/celery_beat.log
+stderr_logfile=/factorydash/logs/celery_beat_err.log
+autorestart=true
+8. docker-compose.yaml
+yaml
+
+Collapse
+
+Wrap
+
+Copy
+services:
+  factorydash:
+    container_name: factorydash
+    image: factorydash:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.local
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  postgres:
+    container_name: factorydash.postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: factorydash
+      POSTGRES_PASSWORD: factorydash
+      POSTGRES_DB: factorydash
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "factorydash"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    container_name: factorydash.redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+9. .env.local
+plaintext
+
+Collapse
+
+Wrap
+
+Copy
+DOCKER_USERNAME=xxxxx
+DOCKER_PASSWORD=xxxxxx
+DJANGO_SETTINGS_MODULE=factorydash.settings
+PYTHONPATH=/factorydash/app/factorydash
+RAILWAY_ENVIRONMENT_NAME=development
+RAILWAY_TOKEN="xxxxxx"
+SECRET_KEY="xxxxxx"
+LOAD_NIST_DATA_SCHEDULE_SECONDS=60
+DATABASE_URL=postgres://factorydash:factorydash@postgres:5432/factorydash
+DATA_RETENTION_DAYS=2
+CELERY_BROKER_URL=redis://redis:6379/0
+CELERY_RESULT_BACKEND=redis://redis:6379/0
+10. pytest.ini
+ini
+
+Collapse
+
+Wrap
+
+Copy
+[pytest]
+DJANGO_SETTINGS_MODULE = factorydash.settings_test
+python_files = tests.py test_*.py *_tests.py
+11. requirements.txt (Example)
+plaintext
+
+Collapse
+
+Wrap
+
+Copy
+django>=5.1.6
+dj-database-url
+gunicorn
+psycopg2-binary
+celery[redis]
+django-celery-beat
+supervisor
+pytest
+pytest-django
+Environment Variable Placement
+Railway (Set in Dashboard under factorydash Service)
+plaintext
+
+Collapse
+
+Wrap
+
+Copy
+DJANGO_SETTINGS_MODULE=factorydash.settings
+PYTHONPATH=/factorydash/app/factorydash
+RAILWAY_ENVIRONMENT_NAME=production
+SECRET_KEY=your-secure-key-here  # Generate with python -c "import secrets; print(secrets.token_urlsafe(50))"
+ALLOWED_HOSTS=your-railway-domain
+LOAD_NIST_DATA_SCHEDULE_SECONDS=60
+DATA_RETENTION_DAYS=2
+DATABASE_URL=${{Postgres.DATABASE_URL}}
+CELERY_BROKER_URL=${{Redis.REDIS_URL}}
+CELERY_RESULT_BACKEND=${{Redis.REDIS_URL}}
+GitHub Secrets (Repository > Settings > Secrets and Variables > Actions)
+plaintext
+
+Collapse
+
+Wrap
+
+Copy
+DOCKER_USERNAME=xxxxx
+DOCKER_PASSWORD=xxxxxx
+RAILWAY_TOKEN=xxxxxx
+Deployment Steps
+Prepare Files:
+Add supervisord.conf to your project root.
+Update requirements.txt with all listed dependencies.
+Commit all files to your GitHub repo.
+Set Up GitHub Secrets:
+Go to repo > Settings > Secrets and Variables > Actions.
+Add DOCKER_USERNAME, DOCKER_PASSWORD, RAILWAY_TOKEN (from Railway dashboard > Account > Tokens).
+Set Up Railway:
+Create a new project and service named factorydash.
+Link to your GitHub repo.
+Add PostgreSQL and Redis services.
+Set the Railway variables above.
+Deploy:
+Push to main.
+Workflow will:
+Run manage.py check to validate settings.
+Run pytest to test logic.
+Build and push Docker image.
+Deploy to Railway, where migrate runs before starting services.
+Local Testing:
+Run docker compose up --build with .env.local to test locally.
+Notes
+Testing: check and pytest use SQLite in CI for speed; migrations use the real database on Railway.
+Celery: All processes (web, worker, Beat) run via supervisord in one container on Railway.
+Security: Replace SECRET_KEY placeholders with a secure value in Railway.
+These files should now fully cover your requirements. Let me know if you need clarification or run into issues!

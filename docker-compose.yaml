@@ -2,19 +2,19 @@ services:
 
   factorydash:
     container_name: factorydash
-    image: factorydash:latest    
+    image: factorydash:latest
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"    
+      - "8000:8000"
     env_file:
-      - ./.env.local
+      - .env.local
     depends_on:
       postgres:
         condition: service_healthy
       redis:
-        condition: service_healthy      
+        condition: service_healthy
 
   postgres:
     container_name: factorydash.postgres
@@ -31,18 +31,18 @@ services:
       test: ["CMD", "pg_isready", "-U", "factorydash"]
       interval: 10s
       timeout: 5s
-      retries: 5      
+      retries: 5
 
   redis:
     container_name: factorydash.redis
-    image: redis:latest    
+    image: redis:latest
     ports:
       - "6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
-      retries: 5      
+      retries: 5
 
 volumes:
   postgres_data:
