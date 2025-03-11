@@ -401,6 +401,8 @@ dckr_pat_299uUmwXM1jM_dKPvdq88OLRyM4
 docker login -u franciscoricardodev
 put the personal acces token
 
+Generate a secure secret key
+python -c "import secrets; print(secrets.token_urlsafe(50))"
 
 
 ## TODO

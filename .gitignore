@@ -76,3 +76,4 @@ celerybeat-schedule-wal
 # Ignore local environment files
 .env
 .env.*
+.secrets
