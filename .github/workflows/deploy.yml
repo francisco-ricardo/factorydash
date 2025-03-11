@@ -39,7 +39,7 @@ jobs:
           DATABASE_URL: sqlite:///test.db
           CELERY_BROKER_URL: redis://localhost:6379/0
           CELERY_RESULT_BACKEND: redis://localhost:6379/0
-          LOAD_NIST_DATA_SCHEDULE_SECONDS: 60
+          LOAD_NIST_DATA_SCHEDULE_SECONDS: 10
           DATA_RETENTION_DAYS: 2
         run: |
           pytest --verbose
