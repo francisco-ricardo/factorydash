@@ -30,6 +30,7 @@ jobs:
         env:
           DJANGO_SETTINGS_MODULE: factorydash.settings_test
           DATABASE_URL: sqlite:///test.db
+          PYTHONPATH: app/factorydash
         run: |
           python app/factorydash/manage.py check --settings=factorydash.settings_test
 
@@ -41,6 +42,7 @@ jobs:
           CELERY_RESULT_BACKEND: redis://localhost:6379/0
           LOAD_NIST_DATA_SCHEDULE_SECONDS: 10
           DATA_RETENTION_DAYS: 2
+          PYTHONPATH: app/factorydash
         run: |
           pytest --verbose
 

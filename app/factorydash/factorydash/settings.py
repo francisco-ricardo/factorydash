@@ -14,16 +14,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 RAILWAY_ENVIRONMENT_NAME = os.getenv("RAILWAY_ENVIRONMENT_NAME", "development")
 IS_PRODUCTION = (RAILWAY_ENVIRONMENT_NAME == "production")
 SECRET_KEY = os.getenv("SECRET_KEY")
-
-print("DEBUG: SECRET_KEY =", SECRET_KEY)  # Temporary debug
-print("DEBUG: RAILWAY_ENVIRONMENT_NAME =", RAILWAY_ENVIRONMENT_NAME)  # Temporary debug
-
 if not SECRET_KEY:
     if not IS_PRODUCTION:
         SECRET_KEY = 'django-insecure-qwba_g+u=^%nl2%p2ih(uzw%jwch6#8r2@z4)nth#e0o1y%mtk'
     else:
         raise ImproperlyConfigured("SECRET_KEY must be set in production. Check Railway variables.")
-
 DEBUG = not IS_PRODUCTION
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
 
