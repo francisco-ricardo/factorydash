@@ -1,0 +1,6 @@
+- Logs rotation
+    - [x] factorydash
+    - [] celery
+    - [] gunicorn
+    - [] supervisor
+

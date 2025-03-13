@@ -37,7 +37,7 @@ RUN pip install --no-cache-dir -r /factorydash/requirements.txt
 EXPOSE 8000
 
 # Set default command
-ENTRYPOINT ["/factorydash/docker-entrypoint-dev.sh"]
-CMD ["/factorydash/docker-cmd-script-dev.sh"]
+ENTRYPOINT ["/factorydash/.devcontainer/docker-entrypoint-dev.sh"]
+CMD ["/factorydash/.devcontainer/docker-cmd-script-dev.sh"]
 
 # EOF

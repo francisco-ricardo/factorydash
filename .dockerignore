@@ -75,6 +75,8 @@ celerybeat-schedule-wal
 
 .git/
 .gitignore
+.devcontainer/
+.dockerignore
 Makefile
 docker-*
 Dockerfile

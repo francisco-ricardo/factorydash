@@ -1,19 +1,20 @@
 # Makefile Documentation
 # This Makefile provides a simple interface for managing the project using Docker.
 
-.PHONY: all up updev downdev help
+.PHONY: uptest downtest updev downdev help
 
 
-# target: all - Executes the run
-all: up
+# target: run - Builds and starts the Docker container locally for testing
+# Description: 
+uptest:
+	docker-compose -f docker-compose.yaml up --build -d
 
 
-# target: run - Builds and starts the Docker container
-# Description: This target builds and starts the Docker container using the
-# docker-compose command. The -d flag runs the containers in detached mode,
-# allowing them to run in the background.
-up:
-	docker-compose -f compose.yaml up --build -d
+downtest:
+	docker rm -f factorydash || true
+	docker rm -f factorydash.postgres || true
+	docker rm -f factorydash.redis || true
+
 
 # target: rundev
 updev:
@@ -26,17 +27,6 @@ downdev:
 	docker rm -f factorydash.celery_beat || true
 	docker rm -f factorydash.redis || true
 	docker rm -f factorydash.db || true
-
-downci:
-	docker rm -f factorydash_container || true
-	docker rm -f act-CI-CD-Pipeline-build-c6acc847991b86805ff6747e2b9238b1d9a97e-63ceb2838de5c49907a7832497a5db298423481b480ab74924db8238358e1ef7 || true
-	docker rm -f act-CI-CD-Pipeline-build-c6acc847991b86805ff6747e2b9238b1d9a97e-b3da62385a9ffa4fbc37a8c89c6048d2bbf805a8f711d0937c9bdf84cd918a45 || true
-	docker rm -f act-CI-CD-Pipeline-build-c6acc847991b86805ff6747e2b9238b1d9a97ef200e170b447ad993dc518506a || true
-	docker rm -f factorydash-postgres-1 || true
-	docker rm -f factorydash-redis-1 || true
-	docker rm -f factorydash || true
-	docker rm -f factorydash.postgres || true
-	docker rm -f factorydash.redis || true
 
 
 # target: help - Displays the available executable targets
