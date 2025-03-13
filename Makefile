@@ -23,10 +23,10 @@ updev:
 
 downdev:
 	docker rm -f factorydash.dev || true
-	docker rm -f factorydash.celery_worker || true
-	docker rm -f factorydash.celery_beat || true
-	docker rm -f factorydash.redis || true
-	docker rm -f factorydash.db || true
+	docker rm -f factorydash.celery_worker.dev || true
+	docker rm -f factorydash.celery_beat.dev || true
+	docker rm -f factorydash.redis.dev || true
+	docker rm -f factorydash.postgres.dev || true
 
 
 # target: help - Displays the available executable targets

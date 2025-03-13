@@ -12,69 +12,70 @@ services:
     working_dir: /factorydash/app/factorydash
     volumes:
       - .:/factorydash
-      - logs_volume:/factorydash/app/factorydash/logs  # Persist logs outside the container
+      - logs_volume:/factorydash/app/factorydash/logs
     ports:
       - "8000:8000"
-    environment:
-      - DATABASE_URL=postgres://factorydash:factorydash@db:5432/factorydash
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - PYTHONPATH=/factorydash/app/factorydash
-      - PYTHONDONTWRITEBYTECODE 1
-      - PYTHONUNBUFFERED 1
-      - DJANGO_SETTINGS_MODULE=factorydash.settings
+    env_file:
+      - .env.factorydash.dev
     depends_on:
-      - db  # Ensure db is started before factorydash.dev
-      - redis # Ensure redis is started before factorydash.dev
+      postgres.dev:
+        condition: service_healthy
+      redis.dev:
+        condition: service_healthy
 
-  celery_worker:
+  celery_worker.dev:
     container_name: factorydash.celery_worker.dev
     image: factorydash.dev:latest
     restart: always
     command: celery -A factorydash worker --loglevel=info
     volumes:
       - .:/factorydash
+    env_file:
+      - .env.factorydash.dev
     depends_on:
       - factorydash.dev
-      - redis
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - PYTHONPATH=/factorydash/app/factorydash
-      - DJANGO_SETTINGS_MODULE=factorydash.settings      
+      - redis.dev
 
-  celery_beat:
+  celery_beat.dev:
     container_name: factorydash.celery_beat.dev
     image: factorydash.dev:latest
     restart: always
     command: celery -A factorydash beat --loglevel=info
     volumes:
       - .:/factorydash
+    env_file:
+      - .env.factorydash.dev
     depends_on:
       - factorydash.dev
-      - redis
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - PYTHONPATH=/factorydash/app/factorydash
-      - DJANGO_SETTINGS_MODULE=factorydash.settings      
+      - redis.dev
 
-  db:
+  postgres.dev:
     container_name: factorydash.postgres.dev
     image: postgres:latest
     restart: always
-    environment:
-      POSTGRES_USER: factorydash
-      POSTGRES_PASSWORD: factorydash
-      POSTGRES_DB: factorydash
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env.postgres.dev            
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "factorydash"]
+      interval: 10s
+      timeout: 5s
+      retries: 5      
 
-  redis:
+  redis.dev:
     container_name: factorydash.redis.dev
     image: redis:latest
     restart: always
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:

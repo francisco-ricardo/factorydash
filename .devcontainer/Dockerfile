@@ -1,14 +1,10 @@
-# Use Python official image
-FROM python:latest
+FROM python:3.13.2-slim
 
 # Set the working directory inside the container
 WORKDIR /factorydash
 
 # Install system dependencies
 RUN apt update && apt install -y \
-    git \
-    curl \
-    openssh-client \
     postgresql-client \
     vim \
     locales \
@@ -19,19 +15,21 @@ RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen && \
     update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 
-# Set environment variables for locale
-ENV LANG en_US.UTF-8
-ENV LC_ALL en_US.UTF-8
+# Set some environment variables
+ENV LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
-# Copy requirements.txt from the root of the project
-COPY requirements.txt /factorydash/requirements.txt
+# Install python requirements
+COPY requirements.txt .
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy scripts for the container startup
-COPY docker-entrypoint-dev.sh /factorydash/docker-entrypoint-dev.sh
-COPY docker-cmd-script-dev.sh /factorydash/docker-cmd-script-dev.sh
+COPY .devcontainer .
 
-# Install Django dependencies
-RUN pip install --no-cache-dir -r /factorydash/requirements.txt
+RUN mkdir -p /factorydash/app/factorydash/logs
 
 # Expose Django's default port
 EXPOSE 8000
