@@ -29,8 +29,6 @@ RUN pip install --upgrade pip && \
 # Copy scripts for the container startup
 COPY .devcontainer .
 
-#RUN mkdir -p /factorydash/app/factorydash/logs
-
 # Expose Django's default port
 EXPOSE 8000
 

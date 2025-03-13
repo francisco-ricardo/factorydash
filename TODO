@@ -4,3 +4,6 @@
     - [] gunicorn
     - [] supervisor
 
+- User interface
+    - [] Login screen
+    - [] Dashboard

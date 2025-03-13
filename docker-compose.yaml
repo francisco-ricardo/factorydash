@@ -9,7 +9,7 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - .env.local
+      - .env.factorydash.test
     depends_on:
       postgres:
         condition: service_healthy
@@ -19,14 +19,12 @@ services:
   postgres:
     container_name: factorydash.postgres
     image: postgres:latest
-    environment:
-      POSTGRES_USER: factorydash
-      POSTGRES_PASSWORD: factorydash
-      POSTGRES_DB: factorydash
     ports:
       - "5432:5432"
     volumes:
       - factorydash_postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env.postgres.test
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "factorydash"]
       interval: 10s
@@ -46,5 +44,6 @@ services:
 
 volumes:
   factorydash_postgres_data:
+    name: factorydash_postgres_data
 
 
