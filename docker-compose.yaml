@@ -26,7 +26,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - factorydash_postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "factorydash"]
       interval: 10s
@@ -45,6 +45,6 @@ services:
       retries: 5
 
 volumes:
-  postgres_data:
+  factorydash_postgres_data:
 
 
