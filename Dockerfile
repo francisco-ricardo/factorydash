@@ -28,10 +28,12 @@ COPY . .
 RUN mkdir -p /factorydash/app/factorydash/logs && \
     python app/factorydash/manage.py collectstatic --noinput
 
+COPY docker-entrypoint.sh /factorydash/docker-entrypoint.sh
+RUN chmod +x /factorydash/docker-entrypoint.sh
+
 EXPOSE 8000
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-CMD ["sh", "-c", "python app/factorydash/manage.py migrate && supervisord -c /etc/supervisor/conf.d/supervisord.conf"]
-
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
 # EOF

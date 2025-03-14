@@ -4,7 +4,7 @@ services:
   factorydash.dev:
     container_name: factorydash.dev
     image: factorydash.dev:latest
-    restart: always
+    restart: no
     build: 
       context: .
       dockerfile: .devcontainer/Dockerfile
@@ -24,7 +24,7 @@ services:
   celery_worker.dev:
     container_name: factorydash.celery_worker.dev
     image: factorydash.dev:latest
-    restart: always
+    restart: no
     command: celery -A factorydash worker --loglevel=info
     volumes:
       - .:/factorydash
@@ -37,7 +37,7 @@ services:
   celery_beat.dev:
     container_name: factorydash.celery_beat.dev
     image: factorydash.dev:latest
-    restart: always
+    restart: no
     command: celery -A factorydash beat --loglevel=info
     volumes:
       - .:/factorydash
@@ -50,7 +50,7 @@ services:
   postgres.dev:
     container_name: factorydash.postgres.dev
     image: postgres:latest
-    restart: always
+    restart: no
     ports:
       - "5432:5432"
     volumes:
@@ -66,7 +66,7 @@ services:
   redis.dev:
     container_name: factorydash.redis.dev
     image: redis:latest
-    restart: always
+    restart: no
     ports:
       - "6379:6379"
     healthcheck:
