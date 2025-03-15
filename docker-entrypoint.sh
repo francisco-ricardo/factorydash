@@ -45,7 +45,7 @@ parse_database_url() {
     DB_PASSWORD=$(echo "$DATABASE_URL" | sed -E 's|^postgres(ql)?:\/\/[^:]+:([^@]+)@.*$|\2|')
     DB_HOST=$(echo "$DATABASE_URL" | sed -E 's|^postgres(ql)?:\/\/[^@]+@([^:/]+).*|\2|')
     DB_PORT=$(echo "$DATABASE_URL" | sed -E 's|^postgres(ql)?:\/\/[^@]+@[^:]+:([0-9]+).*|\2|' || echo "5432")
-    DB_NAME=$(echo "$DATABASE_URL" | sed -E 's|^postgres(ql)?:\/\/[^@]+@[^/]+/(.+)$|\1|')
+    DB_NAME=$(echo "$DATABASE_URL" | sed -E 's|^postgres(ql)?:\/\/[^@]+@[^/]+/(.+)$|\2|')
 
     # Log for debugging
     echo "Parsed DATABASE_URL:"
