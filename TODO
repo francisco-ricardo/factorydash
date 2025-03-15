@@ -1,7 +1,7 @@
 - Test environments
     - [x] dev
     - [x] test
-    - [] cloud
+    - [] cloud -> problems with gunicorn
 
 - Logs rotation
     - [x] factorydash
@@ -12,8 +12,10 @@
 - User interface
     - [] Login screen
     - [] Dashboard (real-time)
+    - [] Logs (real-time)
 
 - Documentation
     - [] Code
     - [] README
     - [] Dockerhub (repository)
+        - [] Improve the versioning
