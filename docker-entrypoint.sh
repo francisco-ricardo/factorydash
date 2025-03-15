@@ -40,11 +40,12 @@ main() {
 parse_database_url() {
 
     # Extract components from DATABASE_URL (e.g., postgres://user:password@host:port/dbname)
-    DB_USER=$(echo "$DATABASE_URL" | sed -E 's|^postgres://([^:]+):.*$|\1|')
-    DB_PASSWORD=$(echo "$DATABASE_URL" | sed -E 's|^postgres://[^:]+:([^@]+)@.*$|\1|')
-    DB_HOST=$(echo "$DATABASE_URL" | sed -E 's|^postgres://[^@]+@([^:/]+).*|\1|')
-    DB_PORT=$(echo "$DATABASE_URL" | sed -E 's|^postgres://[^@]+@[^:]+:([0-9]+).*|\1|' || echo "5432")
-    DB_NAME=$(echo "$DATABASE_URL" | sed -E 's|^postgres://[^@]+@[^/]+/(.+)$|\1|')
+    # Handle both postgres:// and postgresql://
+    DB_USER=$(echo "$DATABASE_URL" | sed -E 's|^postgres(ql)?:\/\/([^:]+):.*$|\2|')
+    DB_PASSWORD=$(echo "$DATABASE_URL" | sed -E 's|^postgres(ql)?:\/\/[^:]+:([^@]+)@.*$|\2|')
+    DB_HOST=$(echo "$DATABASE_URL" | sed -E 's|^postgres(ql)?:\/\/[^@]+@([^:/]+).*|\2|')
+    DB_PORT=$(echo "$DATABASE_URL" | sed -E 's|^postgres(ql)?:\/\/[^@]+@[^:]+:([0-9]+).*|\2|' || echo "5432")
+    DB_NAME=$(echo "$DATABASE_URL" | sed -E 's|^postgres(ql)?:\/\/[^@]+@[^/]+/(.+)$|\1|')
 
     # Log for debugging
     echo "Parsed DATABASE_URL:"
@@ -59,4 +60,3 @@ main
 exec "$@"
 
 # EOF
-
