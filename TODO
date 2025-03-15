@@ -1,6 +1,6 @@
-- Test environment
+- Test environments
     - [x] dev
-    - [] test
+    - [x] test
     - [] cloud
 
 - Logs rotation
@@ -12,3 +12,8 @@
 - User interface
     - [] Login screen
     - [] Dashboard (real-time)
+
+- Documentation
+    - [] Code
+    - [] README
+    - [] Dockerhub (repository)
