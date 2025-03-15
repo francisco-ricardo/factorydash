@@ -10,7 +10,7 @@ if [ "$DATABASE_URL" ]; then
     # Wait for database with timeout
     echo "DATABASE_URL set to: $DATABASE_URL"
     echo "Waiting for database to be ready (timeout: 30s)..."
-    timeout 30s bash -c "until pg_isready -q; do echo 'Database not ready yet. Retrying in 1 second...'; sleep 1; done"
+    timeout 30s bash -c "until pg_isready -h postgres -p 5432 -U factorydash -q; do echo 'Database not ready yet. Retrying in 1 second...'; sleep 1; done"
     if [ $? -ne 0 ]; then
         echo "Error: Database at $DATABASE_URL not ready after 30 seconds. Exiting."
         exit 1

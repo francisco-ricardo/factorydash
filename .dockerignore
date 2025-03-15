@@ -75,11 +75,15 @@ celerybeat-schedule-wal
 
 .git/
 .gitignore
+.github/
 .devcontainer/
 .dockerignore
 Makefile
-docker-*
+docker-compose.yaml
+docker-compose-dev.yaml
 Dockerfile
 tmp/
 logs/
 .secrets
+README.med
+TODO
