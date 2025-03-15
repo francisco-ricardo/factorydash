@@ -1,3 +1,8 @@
+- Test environment
+    - [x] dev
+    - [] test
+    - [] cloud
+
 - Logs rotation
     - [x] factorydash
     - [] celery
@@ -6,4 +11,4 @@
 
 - User interface
     - [] Login screen
-    - [] Dashboard
+    - [] Dashboard (real-time)

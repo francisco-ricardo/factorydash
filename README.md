@@ -1139,3 +1139,153 @@ Testing: check and pytest use SQLite in CI for speed; migrations use the real da
 Celery: All processes (web, worker, Beat) run via supervisord in one container on Railway.
 Security: Replace SECRET_KEY placeholders with a secure value in Railway.
 These files should now fully cover your requirements. Let me know if you need clarification or run into issues!
+
+
+
+## DESCRIPTION
+
+Real-time insights for Smart Manufacturing
+
+
+## DESIGN
+
+- Directory tree
+```bash
+.
+├── Dockerfile
+├── LICENSE
+├── Makefile
+├── README.md
+├── TODO
+├── app
+│   └── factorydash
+│       ├── factorydash
+│       │   ├── __init__.py
+│       │   ├── asgi.py
+│       │   ├── celery.py
+│       │   ├── settings.py
+│       │   ├── settings_test.py
+│       │   ├── tests.py
+│       │   ├── urls.py
+│       │   └── wsgi.py
+│       ├── logs
+│       │   ├── factorydash.log
+│       ├── manage.py
+│       ├── monitoring
+│       │   ├── __init__.py
+│       │   ├── admin.py
+│       │   ├── apps.py
+│       │   ├── management
+│       │   │   ├── __init__.py
+│       │   │   └── commands
+│       │   │       ├── __init__.py
+│       │   │       ├── cleanup.py
+│       │   │       └── load_nist_data.py
+│       │   ├── migrations
+│       │   │   ├── 0001_initial.py
+│       │   │   ├── 0002_rename_monitoring__timesta_4e59ba_idx_machinedata_timesta_635c09_idx_and_more.py
+│       │   │   ├── __init__.py
+│       │   ├── models.py
+│       │   ├── tasks.py
+│       │   ├── tests
+│       │   │   ├── test_integration.py
+│       │   │   ├── test_load_nist_data.py
+│       │   │   ├── test_logging.py
+│       │   │   ├── test_models.py
+│       │   │   └── test_tasks.py
+│       │   ├── tests.py
+│       │   └── views.py
+│       ├── pytest.ini
+│       └── staticfiles
+│           └── admin
+│               ├── css
+│               │   ├── autocomplete.css
+│               │   ├── base.css
+│               │   ├── changelists.css
+│               │   ├── dark_mode.css
+│               │   ├── dashboard.css
+│               │   ├── forms.css
+│               │   ├── login.css
+│               │   ├── nav_sidebar.css
+│               │   ├── responsive.css
+│               │   ├── responsive_rtl.css
+│               │   ├── rtl.css
+│               │   ├── unusable_password_field.css
+│               │   ├── vendor
+│               │   │   └── select2
+│               │   │       ├── LICENSE-SELECT2.md
+│               │   │       ├── select2.css
+│               │   │       └── select2.min.css
+│               │   └── widgets.css
+│               ├── img
+│               │   ├── LICENSE
+│               │   ├── README.txt
+│               │   ├── calendar-icons.svg
+│               │   ├── gis
+│               │   │   ├── move_vertex_off.svg
+│               │   │   └── move_vertex_on.svg
+│               │   ├── icon-addlink.svg
+│               │   ├── icon-alert.svg
+│               │   ├── icon-calendar.svg
+│               │   ├── icon-changelink.svg
+│               │   ├── icon-clock.svg
+│               │   ├── icon-deletelink.svg
+│               │   ├── icon-hidelink.svg
+│               │   ├── icon-no.svg
+│               │   ├── icon-unknown-alt.svg
+│               │   ├── icon-unknown.svg
+│               │   ├── icon-viewlink.svg
+│               │   ├── icon-yes.svg
+│               │   ├── inline-delete.svg
+│               │   ├── search.svg
+│               │   ├── selector-icons.svg
+│               │   ├── sorting-icons.svg
+│               │   ├── tooltag-add.svg
+│               │   └── tooltag-arrowright.svg
+│               └── js
+│                   ├── SelectBox.js
+│                   ├── SelectFilter2.js
+│                   ├── actions.js
+│                   ├── admin
+│                   │   ├── DateTimeShortcuts.js
+│                   │   └── RelatedObjectLookups.js
+│                   ├── autocomplete.js
+│                   ├── calendar.js
+│                   ├── cancel.js
+│                   ├── change_form.js
+│                   ├── core.js
+│                   ├── filters.js
+│                   ├── inlines.js
+│                   ├── jquery.init.js
+│                   ├── nav_sidebar.js
+│                   ├── popup_response.js
+│                   ├── prepopulate.js
+│                   ├── prepopulate_init.js
+│                   ├── theme.js
+│                   ├── unusable_password_field.js
+│                   ├── urlify.js
+│                   └── vendor
+│                       ├── jquery
+│                       │   ├── LICENSE.txt
+│                       │   ├── jquery.js
+│                       │   └── jquery.min.js
+│                       ├── select2
+│                       │   ├── LICENSE.md
+│                       │   ├── i18n
+│                       │   ├── select2.full.js
+│                       │   └── select2.full.min.js
+│                       └── xregexp
+│                           ├── LICENSE.txt
+│                           ├── xregexp.js
+│                           └── xregexp.min.js
+├── celerybeat-schedule
+├── celerybeat-schedule-shm
+├── celerybeat-schedule-wal
+├── docker-compose-dev.yaml
+├── docker-compose.yaml
+├── docker-entrypoint.sh
+├── requirements.txt
+├── supervisord.conf
+
+```
+
