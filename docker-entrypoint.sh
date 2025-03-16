@@ -45,16 +45,12 @@ main() {
     echo "Environment variables:"
     env | sort
 
-    echo "Starting tail of Gunicorn logs in the background"
-    tail -f /factorydash/app/factorydash/logs/gunicorn.err.log &
-    tail -f /factorydash/app/factorydash/logs/gunicorn.out.log &
-
     # Add to docker-entrypoint.sh
     echo "Python path:"
     python -c "import sys; print(sys.path)"
 
-    echo "Checking if wsgi module is importable:"
-    python -c "try: from factorydash.wsgi import application; print('WSGI module importable!'); except Exception as e: print(f'Error importing WSGI module: {e}')"
+    #echo "Checking if wsgi module is importable:"
+    #python -c "try: from factorydash.wsgi import application; print('WSGI module importable!'); except Exception as e: print(f'Error importing WSGI module: {e}')"
 
 
 }
