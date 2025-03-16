@@ -32,6 +32,16 @@ main() {
         echo "DATABASE_URL not set. Skipping database setup."
     fi
 
+    echo "Verifying application structure..."
+    ls -la /factorydash/app/factorydash/
+    if [ -f /factorydash/app/factorydash/factorydash/wsgi.py ]; then
+        echo "WSGI file found at expected location"
+    else
+        echo "ERROR: WSGI file not found at expected location"
+        echo "Checking for wsgi.py in other locations:"
+        find /factorydash -name wsgi.py
+    fi
+
 }
 
 
