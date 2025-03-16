@@ -20,6 +20,8 @@ if not SECRET_KEY:
     else:
         raise ImproperlyConfigured("SECRET_KEY must be set in production. Check Railway variables.")
 DEBUG = not IS_PRODUCTION
+# TODO: Set DEBUG to False in production
+DEBUG = true
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
 RAILWAY_PUBLIC_DOMAIN = os.getenv('RAILWAY_PUBLIC_DOMAIN', '')

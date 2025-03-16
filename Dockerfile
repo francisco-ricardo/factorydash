@@ -31,7 +31,7 @@ RUN mkdir -p /factorydash/app/factorydash/logs && \
 COPY docker-entrypoint.sh .
 RUN chmod +x /factorydash/docker-entrypoint.sh
 
-EXPOSE 8000
+EXPOSE 8080
 
 # Add this before the ENTRYPOINT
 RUN echo "Displaying project structure:" && \
