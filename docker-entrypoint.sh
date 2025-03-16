@@ -45,10 +45,6 @@ main() {
     echo "Environment variables:"
     env | sort
 
-    echo "Network configuration:"
-    ip addr
-    netstat -tuln
-
 }
 
 
