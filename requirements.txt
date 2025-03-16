@@ -1,9 +1,9 @@
 django>=5.1.6
 dj-database-url
-gunicorn
+gunicorn>=20.1.0
 psycopg2-binary
-celery
-redis
+celery>=5.2.7
+redis>=4.5.1
 django-celery-beat
 supervisor
 pytest 
