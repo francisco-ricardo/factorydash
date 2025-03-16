@@ -42,6 +42,13 @@ main() {
         find /factorydash -name wsgi.py
     fi
 
+    echo "Environment variables:"
+    env | sort
+
+    echo "Network configuration:"
+    ip addr
+    netstat -tuln
+
 }
 
 
