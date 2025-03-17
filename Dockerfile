@@ -25,13 +25,13 @@ RUN pip install --upgrade pip && \
 
 COPY . .
 
-RUN mkdir -p /factorydash/app/factorydash/logs && \
-    python app/factorydash/manage.py collectstatic --noinput
+#RUN mkdir -p /factorydash/app/factorydash/logs && \
+#    python app/factorydash/manage.py collectstatic --noinput
+
+RUN mkdir -p /factorydash/app/factorydash/logs
 
 COPY docker-entrypoint.sh .
 RUN chmod +x /factorydash/docker-entrypoint.sh
-
-EXPOSE 8080
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 ENTRYPOINT ["/factorydash/docker-entrypoint.sh"]

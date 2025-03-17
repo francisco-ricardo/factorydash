@@ -2,17 +2,17 @@
     - [x] dev
     - [x] test
     - [] cloud
-    
-      - [] Revisar o deploy para o cloud
-        - [] setting.py
+
+      - [x] Revisar o deploy para o cloud
+        - [x] settings.py
             ALLOWED_HOSTS
             DEBUG
-        - [] supervisor.conf
-            - [] PORT (variável de ambiente)
-        - [] Dockerfile
-            - [] EXPOSED PORT
-        - [] docker-entrypoint.sh
-            - [] Eliminar testes desnecessarios
+        - [x] supervisor.conf
+            - PORT (variável de ambiente)
+        - [x] Dockerfile
+            - EXPOSED PORT
+        - [x] docker-entrypoint.sh
+            - Eliminar testes desnecessarios
 
       - [] Implementar task default para testar o celery
 
