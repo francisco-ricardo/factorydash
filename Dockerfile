@@ -33,11 +33,6 @@ RUN chmod +x /factorydash/docker-entrypoint.sh
 
 EXPOSE 8080
 
-# Add this before the ENTRYPOINT
-RUN echo "Displaying project structure:" && \
-    find /factorydash -type f -name "*.py" | grep -E 'wsgi|asgi|celery' && \
-    echo "Done."
-
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 ENTRYPOINT ["/factorydash/docker-entrypoint.sh"]
 CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

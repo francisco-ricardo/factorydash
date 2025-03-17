@@ -6,6 +6,8 @@
 set -e
 
 
+# Functions definitions
+
 # Main function
 main() {
 
@@ -77,7 +79,10 @@ parse_database_url() {
 }
 
 
+# Run main function
 main
+
+# Run the command passed to the Docker container
 exec "$@"
 
 # EOF
