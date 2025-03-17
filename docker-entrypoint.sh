@@ -59,6 +59,12 @@ main() {
     echo "Collecting static files..."
     python app/factorydash/manage.py collectstatic --noinput
 
+
+    # TODO
+    # Debug Gunicorn
+    echo "Testing Gunicorn..."
+    /usr/local/bin/gunicorn factorydash.wsgi:application --bind 0.0.0.0:${PORT:-8080} --timeout 10 --log-level debug || echo "Gunicorn failed: $?"
+
 }
 
 
