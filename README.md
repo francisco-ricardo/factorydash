@@ -1150,6 +1150,7 @@ Real-time insights for Smart Manufacturing
 ## DESIGN
 
 - Directory tree
+
 ```bash
 .
 ├── Dockerfile
@@ -1199,85 +1200,8 @@ Real-time insights for Smart Manufacturing
 │       └── staticfiles
 │           └── admin
 │               ├── css
-│               │   ├── autocomplete.css
-│               │   ├── base.css
-│               │   ├── changelists.css
-│               │   ├── dark_mode.css
-│               │   ├── dashboard.css
-│               │   ├── forms.css
-│               │   ├── login.css
-│               │   ├── nav_sidebar.css
-│               │   ├── responsive.css
-│               │   ├── responsive_rtl.css
-│               │   ├── rtl.css
-│               │   ├── unusable_password_field.css
-│               │   ├── vendor
-│               │   │   └── select2
-│               │   │       ├── LICENSE-SELECT2.md
-│               │   │       ├── select2.css
-│               │   │       └── select2.min.css
-│               │   └── widgets.css
 │               ├── img
-│               │   ├── LICENSE
-│               │   ├── README.txt
-│               │   ├── calendar-icons.svg
-│               │   ├── gis
-│               │   │   ├── move_vertex_off.svg
-│               │   │   └── move_vertex_on.svg
-│               │   ├── icon-addlink.svg
-│               │   ├── icon-alert.svg
-│               │   ├── icon-calendar.svg
-│               │   ├── icon-changelink.svg
-│               │   ├── icon-clock.svg
-│               │   ├── icon-deletelink.svg
-│               │   ├── icon-hidelink.svg
-│               │   ├── icon-no.svg
-│               │   ├── icon-unknown-alt.svg
-│               │   ├── icon-unknown.svg
-│               │   ├── icon-viewlink.svg
-│               │   ├── icon-yes.svg
-│               │   ├── inline-delete.svg
-│               │   ├── search.svg
-│               │   ├── selector-icons.svg
-│               │   ├── sorting-icons.svg
-│               │   ├── tooltag-add.svg
-│               │   └── tooltag-arrowright.svg
 │               └── js
-│                   ├── SelectBox.js
-│                   ├── SelectFilter2.js
-│                   ├── actions.js
-│                   ├── admin
-│                   │   ├── DateTimeShortcuts.js
-│                   │   └── RelatedObjectLookups.js
-│                   ├── autocomplete.js
-│                   ├── calendar.js
-│                   ├── cancel.js
-│                   ├── change_form.js
-│                   ├── core.js
-│                   ├── filters.js
-│                   ├── inlines.js
-│                   ├── jquery.init.js
-│                   ├── nav_sidebar.js
-│                   ├── popup_response.js
-│                   ├── prepopulate.js
-│                   ├── prepopulate_init.js
-│                   ├── theme.js
-│                   ├── unusable_password_field.js
-│                   ├── urlify.js
-│                   └── vendor
-│                       ├── jquery
-│                       │   ├── LICENSE.txt
-│                       │   ├── jquery.js
-│                       │   └── jquery.min.js
-│                       ├── select2
-│                       │   ├── LICENSE.md
-│                       │   ├── i18n
-│                       │   ├── select2.full.js
-│                       │   └── select2.full.min.js
-│                       └── xregexp
-│                           ├── LICENSE.txt
-│                           ├── xregexp.js
-│                           └── xregexp.min.js
 ├── celerybeat-schedule
 ├── celerybeat-schedule-shm
 ├── celerybeat-schedule-wal
@@ -1289,3 +1213,164 @@ Real-time insights for Smart Manufacturing
 
 ```
 
+- Dockerfile
+
+```bash
+FROM python:3.13.2-slim
+
+WORKDIR /factorydash
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    locales \
+    supervisor \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up locale
+RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    locale-gen && \
+    update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+
+ENV LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+COPY requirements.txt .
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+RUN mkdir -p /factorydash/app/factorydash/logs && \
+    python app/factorydash/manage.py collectstatic --noinput
+
+COPY docker-entrypoint.sh .
+RUN chmod +x /factorydash/docker-entrypoint.sh
+
+EXPOSE 8080
+
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+ENTRYPOINT ["/factorydash/docker-entrypoint.sh"]
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+
+# EOF
+
+```
+
+- docker-entrypoint.sh
+
+```bash
+#!/bin/bash
+
+# This script is the entrypoint for the Docker container.
+# It is responsible for running migrations and starting the application.
+
+set -e
+
+
+# Functions definitions
+
+# Main function
+main() {
+
+    # Run migrations if DATABASE_URL is set
+    if [ "$DATABASE_URL" ]; then
+        echo "DATABASE_URL set to: $DATABASE_URL"
+        parse_database_url
+
+        # Assumes that DBMS is Postgres
+        # Run pg_isready to check if the database is ready
+
+        # Wait for database with timeout
+        echo "Waiting for database to be ready (timeout: 30s)..."
+        timeout 30s bash -c "until pg_isready -h \"$DB_HOST\" -p \"$DB_PORT\" -U \"$DB_USER\" -d \"$DB_NAME\" -q; do echo 'Database not ready yet. Retrying in 1 second...'; sleep 1; done"
+        if [ $? -ne 0 ]; then
+            echo "Error: Database at $DATABASE_URL not ready after 30 seconds. Exiting."
+            exit 1
+        fi
+        echo "Database is ready!"
+
+        echo "Running migrations..."
+        python app/factorydash/manage.py migrate --noinput
+    else
+        echo "DATABASE_URL not set. Skipping database setup."
+    fi
+
+    echo "Verifying application structure..."
+    ls -la /factorydash/app/factorydash/
+    if [ -f /factorydash/app/factorydash/factorydash/wsgi.py ]; then
+        echo "WSGI file found at expected location"
+    else
+        echo "ERROR: WSGI file not found at expected location"
+        echo "Checking for wsgi.py in other locations:"
+        find /factorydash -name wsgi.py
+    fi
+
+    echo "Environment variables:"
+    env | sort
+
+    # Add to docker-entrypoint.sh
+    echo "Python path:"
+    python -c "import sys; print(sys.path)"
+
+    #echo "Checking if wsgi module is importable:"
+    #python -c "try: from factorydash.wsgi import application; print('WSGI module importable!'); except Exception as e: print(f'Error importing WSGI module: {e}')"
+
+
+}
+
+
+# Function to parse DATABASE_URL
+# Assumes DATABASE_URL is set and in the format: postgres://user:password@host:port/dbname
+parse_database_url() {
+
+    # Extract components from DATABASE_URL (e.g., postgres://user:password@host:port/dbname)
+    # Handle both postgres:// and postgresql://
+    DB_USER=$(echo "$DATABASE_URL" | sed -E 's|^postgres(ql)?:\/\/([^:]+):.*$|\2|')
+    DB_PASSWORD=$(echo "$DATABASE_URL" | sed -E 's|^postgres(ql)?:\/\/[^:]+:([^@]+)@.*$|\2|')
+    DB_HOST=$(echo "$DATABASE_URL" | sed -E 's|^postgres(ql)?:\/\/[^@]+@([^:/]+).*|\2|')
+    DB_PORT=$(echo "$DATABASE_URL" | sed -E 's|^postgres(ql)?:\/\/[^@]+@[^:]+:([0-9]+).*|\2|' || echo "5432")
+    DB_NAME=$(echo "$DATABASE_URL" | sed -E 's|^postgres(ql)?:\/\/[^@]+@[^/]+/(.+)$|\2|')
+
+    # Log for debugging
+    echo "Parsed DATABASE_URL:"
+    echo "  User: $DB_USER"
+    echo "  Host: $DB_HOST"
+    echo "  Port: $DB_PORT"
+    echo "  Database: $DB_NAME"
+}
+
+
+# Run main function
+main
+
+# Run the command passed to the Docker container
+exec "$@"
+
+# EOF
+
+```
+
+- requirements.txt
+
+```bash
+django>=5.1.6
+dj-database-url
+gunicorn>=20.1.0
+psycopg2-binary
+celery>=5.2.7
+redis>=4.5.1
+django-celery-beat
+supervisor
+pytest 
+pytest-django 
+pytest-mock
+requests
+lxml
+pytz
+
+```
+
+- 

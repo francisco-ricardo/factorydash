@@ -1,7 +1,37 @@
 - Test environments
     - [x] dev
     - [x] test
-    - [] cloud -> problems with gunicorn
+    - [] cloud
+    
+      - [] Revisar o deploy para o cloud
+        - [] setting.py
+            ALLOWED_HOSTS
+            DEBUG
+        - [] supervisor.conf
+            - [] PORT (variável de ambiente)
+        - [] Dockerfile
+            - [] EXPOSED PORT
+        - [] docker-entrypoint.sh
+            - [] Eliminar testes desnecessarios
+
+      - [] Implementar task default para testar o celery
+
+    monitoring/tasks.py
+    ```python  
+    from celery import shared_task
+    import logging
+    logger = logging.getLogger(__name__)
+
+    @shared_task
+    def debug_task():
+        logger.info("Celery debug task ran successfully!")
+        return "Debug task completed"
+    ```
+
+    ```python
+    from monitoring.tasks import debug_task
+    debug_task.delay()
+    ```
 
 - Logs rotation
     - [x] factorydash
@@ -10,6 +40,9 @@
     - [] supervisor
 
 - User interface
+    - Links: 
+        https://factorydash-production.up.railway.app/
+        https://factorydash-production.up.railway.app/health/
     - [] Login screen
     - [] Dashboard (real-time)
     - [] Logs (real-time)
