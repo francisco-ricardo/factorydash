@@ -85,4 +85,10 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT: ${{ secrets.RAILWAY_PROJECT_ID }}
-        run: railway up --service factorydash --environment production
+        run: |
+          until railway up --service factorydash --environment production; do
+            echo "Retrying deployment..."
+            sleep 10
+          done
+          
+          
