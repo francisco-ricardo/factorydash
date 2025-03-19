@@ -12,11 +12,11 @@ import os
 from django.core.wsgi import get_wsgi_application
 
 # Debugging
-print("WSGI FILE IS BEING EXECUTED")
+print("INFO: WSGI file is being executed")
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'factorydash.settings')
 
 application = get_wsgi_application()
 
 # Debugging
-print("WSGI APPLICATION INITIALIZED")
+print("INFO: WSGI application initialized")

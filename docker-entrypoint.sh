@@ -34,38 +34,13 @@ main() {
         echo "DATABASE_URL not set. Skipping database setup."
     fi
 
-    #echo "Verifying application structure..."
-    #ls -la /factorydash/app/factorydash/
-    #if [ -f /factorydash/app/factorydash/factorydash/wsgi.py ]; then
-        #echo "WSGI file found at expected location"
-    #else
-        #echo "ERROR: WSGI file not found at expected location"
-        #echo "Checking for wsgi.py in other locations:"
-        #find /factorydash -name wsgi.py
-    #fi
-
+    # Print environment variables (debbuging)
     echo "Environment variables:"
     env | sort
-
-    # Add to docker-entrypoint.sh
-    #echo "Python path:"
-    #python -c "import sys; print(sys.path)"
-
-    #echo "Checking if wsgi module is importable:"
-    #python -c "try: from factorydash.wsgi import application; print('WSGI module importable!'); except Exception as e: print(f'Error importing WSGI module: {e}')"
-
 
     # Collect static files
     echo "Collecting static files..."
     python app/factorydash/manage.py collectstatic --noinput
-
-
-    # TODO
-    # Debug Gunicorn
-    #echo "Testing Gunicorn..."
-    #/usr/local/bin/gunicorn factorydash.wsgi:application --bind 0.0.0.0:${PORT:-8080} --timeout 10 --log-level debug || echo "Gunicorn test failed with exit code: $?"
-    #echo "Starting supervisord..."
-    #exec supervisord -c /factorydash/supervisord.conf
 
 }
 
@@ -93,20 +68,6 @@ parse_database_url() {
 
 # Run main function
 main
-
-
-# Add this to print the gunicorn error log
-if [ -f /factorydash/app/factorydash/logs/gunicorn.err.log ]; then
-    echo "--- gunicorn.err.log ---"
-    cat /factorydash/app/factorydash/logs/gunicorn.err.log
-    echo "--- end gunicorn.err.log ---"
-fi
-
-if [ -f /factorydash/app/factorydash/logs/gunicorn.out.log ]; then
-    echo "--- gunicorn.out.log ---"
-    cat /factorydash/app/factorydash/logs/gunicorn.out.log
-    echo "--- end gunicorn.out.log ---"
-fi
 
 # Run the command passed to the Docker container
 exec "$@"

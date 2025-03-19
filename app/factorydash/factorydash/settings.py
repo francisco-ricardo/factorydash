@@ -20,16 +20,8 @@ if not SECRET_KEY:
     else:
         raise ImproperlyConfigured("SECRET_KEY must be set in production. Check Railway variables.")
 DEBUG = not IS_PRODUCTION
-
-#DEBUG = True
-
-
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
 
-#ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
-#RAILWAY_PUBLIC_DOMAIN = os.getenv('RAILWAY_PUBLIC_DOMAIN', '')
-#if RAILWAY_PUBLIC_DOMAIN:
-    #ALLOWED_HOSTS.append(RAILWAY_PUBLIC_DOMAIN)
 
 # Database configuration
 DEFAULT_DB_CONFIG = {

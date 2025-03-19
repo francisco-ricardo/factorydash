@@ -1373,4 +1373,9 @@ pytz
 
 ```
 
-- 
+Your are a django software engineer with full-stack knowledge (Server Side Renderging).
+
+
+## Description
+
+Proce

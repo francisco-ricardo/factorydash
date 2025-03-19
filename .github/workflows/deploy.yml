@@ -86,9 +86,15 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT: ${{ secrets.RAILWAY_PROJECT_ID }}
         run: |
-          until railway up --service factorydash --environment production; do
-            echo "Retrying deployment..."
-            sleep 10
+          retry_count=0
+          max_retries=5
+          until [ $retry_count -ge $max_retries ]
+          do
+            railway up --service factorydash --environment production && break
+            retry_count=$((retry_count+1))
+            echo "Retry $retry_count/$max_retries..."
+            sleep 20
           done
+
           
           
