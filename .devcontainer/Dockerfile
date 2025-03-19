@@ -29,9 +29,6 @@ RUN pip install --upgrade pip && \
 # Copy scripts for the container startup
 COPY .devcontainer .
 
-# Expose Django's default port
-EXPOSE 8000
-
 # Set default command
 ENTRYPOINT ["/factorydash/.devcontainer/docker-entrypoint-dev.sh"]
 CMD ["/factorydash/.devcontainer/docker-cmd-script-dev.sh"]

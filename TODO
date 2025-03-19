@@ -1,7 +1,8 @@
 - Test environments
-    - [x] dev
+    - [] dev
+        - Ajustar ambiente dev para rodar com o supervisor
     - [x] test
-    - [] cloud
+    - [x] cloud
 
       - [x] Revisar o deploy para o cloud
         - [x] settings.py
@@ -35,9 +36,9 @@
 
 - Logs rotation
     - [x] factorydash
-    - [] celery
-    - [] gunicorn
-    - [] supervisor
+    - [x] celery
+    - [x] gunicorn
+    - [x] supervisor
 
 - User interface
     - Links: 
@@ -51,4 +52,4 @@
     - [] Code
     - [] README
     - [] Dockerhub (repository)
-        - [] Improve the versioning
+        - [] Improve the versioning (use a env var instead of github.sha)
