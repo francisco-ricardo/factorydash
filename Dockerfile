@@ -33,8 +33,9 @@ RUN mkdir -p /factorydash/app/factorydash/logs
 COPY docker-entrypoint.sh .
 RUN chmod +x /factorydash/docker-entrypoint.sh
 
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+#COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 ENTRYPOINT ["/factorydash/docker-entrypoint.sh"]
-CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+#CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+CMD ["supervisord", "-c", "/factorydash/supervisord.conf"]
 
 # EOF

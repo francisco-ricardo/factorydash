@@ -34,15 +34,15 @@ main() {
         echo "DATABASE_URL not set. Skipping database setup."
     fi
 
-    echo "Verifying application structure..."
+    #echo "Verifying application structure..."
     #ls -la /factorydash/app/factorydash/
-    if [ -f /factorydash/app/factorydash/factorydash/wsgi.py ]; then
-        echo "WSGI file found at expected location"
-    else
-        echo "ERROR: WSGI file not found at expected location"
+    #if [ -f /factorydash/app/factorydash/factorydash/wsgi.py ]; then
+        #echo "WSGI file found at expected location"
+    #else
+        #echo "ERROR: WSGI file not found at expected location"
         #echo "Checking for wsgi.py in other locations:"
         #find /factorydash -name wsgi.py
-    fi
+    #fi
 
     echo "Environment variables:"
     env | sort
@@ -62,12 +62,10 @@ main() {
 
     # TODO
     # Debug Gunicorn
-    echo "Testing Gunicorn..."
-    /usr/local/bin/gunicorn factorydash.wsgi:application --bind 0.0.0.0:${PORT:-8080} --timeout 10 --log-level debug || echo "Gunicorn test failed with exit code: $?"
-    echo "Starting supervisord..."
-    exec supervisord -c /factorydash/supervisord.conf
-
-
+    #echo "Testing Gunicorn..."
+    #/usr/local/bin/gunicorn factorydash.wsgi:application --bind 0.0.0.0:${PORT:-8080} --timeout 10 --log-level debug || echo "Gunicorn test failed with exit code: $?"
+    #echo "Starting supervisord..."
+    #exec supervisord -c /factorydash/supervisord.conf
 
 }
 
