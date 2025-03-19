@@ -94,6 +94,20 @@ parse_database_url() {
 # Run main function
 main
 
+
+# Add this to print the gunicorn error log
+if [ -f /factorydash/app/factorydash/logs/gunicorn.err.log ]; then
+    echo "--- gunicorn.err.log ---"
+    cat /factorydash/app/factorydash/logs/gunicorn.err.log
+    echo "--- end gunicorn.err.log ---"
+fi
+
+if [ -f /factorydash/app/factorydash/logs/gunicorn.out.log ]; then
+    echo "--- gunicorn.out.log ---"
+    cat /factorydash/app/factorydash/logs/gunicorn.out.log
+    echo "--- end gunicorn.out.log ---"
+fi
+
 # Run the command passed to the Docker container
 exec "$@"
 
