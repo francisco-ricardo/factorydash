@@ -8,6 +8,7 @@ RUN apt update && apt install -y \
     postgresql-client \
     vim \
     locales \
+    supervisor \
     && rm -rf /var/lib/apt/lists/*
 
 # Set up locale correctly

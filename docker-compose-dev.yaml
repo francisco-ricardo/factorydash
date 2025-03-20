@@ -11,8 +11,6 @@ services:
     working_dir: /factorydash/app/factorydash
     volumes:
       - .:/factorydash
-    ports:
-      - "8000:8000"
     env_file:
       - .env.factorydash.dev
     depends_on:
@@ -21,31 +19,6 @@ services:
       redis.dev:
         condition: service_healthy
 
-  celery_worker.dev:
-    container_name: factorydash.celery_worker.dev
-    image: factorydash.dev:latest
-    restart: "no"
-    command: celery -A factorydash worker --loglevel=info
-    volumes:
-      - .:/factorydash
-    env_file:
-      - .env.factorydash.dev
-    depends_on:
-      - factorydash.dev
-      - redis.dev
-
-  celery_beat.dev:
-    container_name: factorydash.celery_beat.dev
-    image: factorydash.dev:latest
-    restart: "no"
-    command: celery -A factorydash beat --loglevel=info
-    volumes:
-      - .:/factorydash
-    env_file:
-      - .env.factorydash.dev
-    depends_on:
-      - factorydash.dev
-      - redis.dev
 
   postgres.dev:
     container_name: factorydash.postgres.dev
