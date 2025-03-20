@@ -9,6 +9,8 @@ services:
       context: .
       dockerfile: .devcontainer/Dockerfile
     working_dir: /factorydash/app/factorydash
+    ports:
+      - "8080:8080"
     volumes:
       - .:/factorydash
     env_file:

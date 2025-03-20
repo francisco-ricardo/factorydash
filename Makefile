@@ -1,22 +1,10 @@
 # Makefile Documentation
 # This Makefile provides a simple interface for managing the project using Docker.
 
-.PHONY: uptest downtest updev downdev help
+.PHONY: updev downdev rundev stopdev help
 
 
-# target: run - Builds and starts the Docker container locally for testing
-# Description: 
-uptest:
-	docker-compose -f docker-compose.yaml up --build -d
-
-
-downtest:
-	docker rm -f factorydash || true
-	docker rm -f factorydash.postgres || true
-	docker rm -f factorydash.redis || true
-
-
-# target: rundev
+# target: updev
 updev:
 	docker-compose -f docker-compose-dev.yaml up --build -d
 
@@ -27,6 +15,14 @@ downdev:
 	docker rm -f factorydash.celery_beat.dev || true
 	docker rm -f factorydash.redis.dev || true
 	docker rm -f factorydash.postgres.dev || true
+
+
+# target: rundev
+rundev:
+	docker exec factorydash.dev supervisord -c /factorydash/.devcontainer/supervisord.dev.conf
+
+stopdev:
+	docker exec factorydash.dev pkill supervisord
 
 
 # target: help - Displays the available executable targets

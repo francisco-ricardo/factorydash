@@ -9,6 +9,7 @@ RUN apt update && apt install -y \
     vim \
     locales \
     supervisor \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
 # Set up locale correctly
