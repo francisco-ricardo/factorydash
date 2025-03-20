@@ -1,7 +1,6 @@
 - Test environments
-    - [] dev
+    - [x] dev
         - Ajustar ambiente dev para rodar com o supervisor
-    - [x] test
     - [x] cloud
 
       - [x] Revisar o deploy para o cloud
@@ -53,3 +52,134 @@
     - [] README
     - [] Dockerhub (repository)
         - [] Improve the versioning (use a env var instead of github.sha)
+
+
+## DESCRIPTION
+
+You are a full-stack software developer highly experienced with Server Sider Rendering.
+You will create the files for the user interface of the factorydash project.
+This project aims to provide Real-time insights for Smart Manufacturing.
+I am working on this project for my porftolio.
+I intend to strengthen my skills in modern Server-Side Rendering with this stage of the project.
+Think as a a strict IT interviewer.
+
+## CONTEXT
+
+- A working dashboard that pulls & displays NIST machine data
+- Django Templates + Bootstrap for UI (keeping it simple).
+- Add Real-Time Data Updates 
+  - Use Django’s WebSockets (Django Channels).
+  - Implement live updates for key metrics on the dashboard.
+  - Show a timestamp indicating when data was last updated.
+- Build a clean dashboard layout (cards, tables, charts).
+- Set up a navbar with links to key views.
+- Implement Data Display.
+  - Create views & templates to display machine metrics.
+  - Use Django ORM queries to retrieve data.
+  - Panels for monitoring machine performance:
+    - Temperature;
+    - Spindle Speed;
+    - Feed Rate;
+    - Emergency Stop Status;
+    - Current machine status (e.g., running/stopped);
+    - Recent force readings (F, Fz);
+    - Tool usage statistics.
+- Add a "Live Data" Indicator:
+  - Show last updated timestamp to indicate when the data was last fetched.
+- Enable Filtering by Time Range
+ - Allow users to view data for the last hour, last day, last week.
+
+Next I will share some files with you.
+
+## ATTACHMENTS
+
+- Directory tree
+
+.
+├── Dockerfile
+├── LICENSE
+├── Makefile
+├── README.md
+├── TODO
+├── app
+│   └── factorydash
+│       ├── celerybeat-schedule
+│       ├── celerybeat-schedule-shm
+│       ├── celerybeat-schedule-wal
+│       ├── factorydash
+│       │   ├── __init__.py
+│       │   ├── asgi.py
+│       │   ├── celery.py
+│       │   ├── settings.py
+│       │   ├── settings_test.py
+│       │   ├── tests.py
+│       │   ├── urls.py
+│       │   └── wsgi.py
+│       ├── logs
+│       ├── manage.py
+│       ├── monitoring
+│       │   ├── __init__.py
+│       │   ├── admin.py
+│       │   ├── apps.py
+│       │   ├── management
+│       │   │   ├── __init__.py
+│       │   │   └── commands
+│       │   │       ├── __init__.py
+│       │   │       ├── cleanup.py
+│       │   │       └── load_nist_data.py
+│       │   ├── migrations
+│       │   │   ├── __init__.py
+│       │   ├── models.py
+│       │   ├── tasks.py
+│       │   ├── tests
+│       │   │   ├── test_integration.py
+│       │   │   ├── test_load_nist_data.py
+│       │   │   ├── test_logging.py
+│       │   │   ├── test_models.py
+│       │   │   └── test_tasks.py
+│       │   ├── tests.py
+│       │   └── views.py
+│       ├── pytest.ini
+│       └── staticfiles
+│           └── admin
+│               ├── css
+│               │   ├── vendor
+│               │   │   └── select2
+│               ├── img
+│               │   ├── gis
+│               └── js
+│                   ├── admin
+│                   └── vendor
+│                       ├── jquery
+│                       ├── select2
+│                       │   ├── LICENSE.md
+│                       │   ├── i18n
+│                       └── xregexp
+│                           ├── LICENSE.txt
+├── docker-compose-dev.yaml
+├── docker-entrypoint.sh
+├── requirements.txt
+├── supervisord.conf
+
+
+- Dockerfile
+
+- requirements.txt
+
+- supervisord.conf
+
+- docker-entrypoint.sh
+
+- deployment.yml
+
+- settings.py
+
+- celery.py
+
+- tests.py
+
+- tasks.py
+
+- cleanup.py
+
+- load_nist_data.py
