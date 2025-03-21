@@ -19,11 +19,23 @@ from django.urls import path
 from django.http import HttpResponse
 
 
-def health_check(request):
+def health_check(request: HttpRequest) -> HttpResponse:
+    """
+    Simple health check endpoint.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request.
+
+    Returns:
+        HttpResponse: A response with 'OK' status.
+    """    
     return HttpResponse("OK")
 
 
-urlpatterns = [    
+
+urlpatterns: list[path] = [
     path('admin/', admin.site.urls),
     path('health/', health_check, name='health_check'),
 ]
+
+# EOF
