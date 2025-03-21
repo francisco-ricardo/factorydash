@@ -40,12 +40,32 @@
     - [x] supervisor
 
 - User interface
+    - Following Grok assistance
     - Links: 
         https://factorydash-production.up.railway.app/
         https://factorydash-production.up.railway.app/health/
-    - [] Login screen
-    - [] Dashboard (real-time)
-    - [] Logs (real-time)
+    - [] Enhance docstrings and type hints
+        - [x] models.py
+        - [x] tasks.py
+        - [x] urls.py
+    - New files for UI
+        - [] views.py
+        - [] consumers.py
+        - [] routing.py
+        - [] tasks.py (update)
+        - [] urls.py (update)
+        - [] dashboard.html
+        - [] view.py
+    - Setup
+        - [] requirements.txt
+        - [] settings.py
+        - [] asgi.py
+    - Deal with improvements
+        - [] Gemini
+        - [] ChatGpt
+        - [] Grok
+
+
 
 - Documentation
     - [] Code
