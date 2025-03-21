@@ -65,6 +65,8 @@ Think as a a strict IT interviewer.
 
 ## CONTEXT
 
+- Generate docstrings for all python files, following best practices.
+- Use type hints for all functions and methods.
 - A working dashboard that pulls & displays NIST machine data
 - Django Templates + Bootstrap for UI (keeping it simple).
 - Add Real-Time Data Updates 
