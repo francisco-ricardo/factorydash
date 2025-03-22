@@ -1,13 +1,16 @@
 """
 This module defines Celery tasks for the monitoring app in the factorydash project.
 
-Tasks include fetching NIST machine data and cleaning up old records.
+Tasks include fetching NIST machine data, cleaning up old records, 
+and updating the dashboard.
 """
 
 import factorydash  # Sets up Django environment and logging
 
 from celery import shared_task
 from django.core.management import call_command
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 
 @shared_task
@@ -48,6 +51,20 @@ def cleanup_task() -> str:
     else:
         factorydash.logger.info("Celery Task: Successfully deleted old data")
         return "Successfully deleted old data."
+
+
+@shared_task
+def update_dashboard() -> None:
+    """
+    Celery task to trigger real-time dashboard updates via WebSocket.
+
+    Sends a group message to the 'dashboard' channel layer to update 
+    connected clients.
+    """
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        'dashboard', {'type': 'update_data'}
+    )
 
 
 # EOF

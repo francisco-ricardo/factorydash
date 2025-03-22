@@ -17,6 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.http import HttpResponse
+from monitoring import views
+from django.http.request import HttpRequest
 
 
 def health_check(request: HttpRequest) -> HttpResponse:
@@ -32,9 +34,9 @@ def health_check(request: HttpRequest) -> HttpResponse:
     return HttpResponse("OK")
 
 
-
 urlpatterns: list[path] = [
     path('admin/', admin.site.urls),
+    path('', views.dashboard, name='dashboard'),
     path('health/', health_check, name='health_check'),
 ]
 

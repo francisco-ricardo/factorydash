@@ -63,6 +63,10 @@ app.conf.beat_schedule = {
         "task": "monitoring.tasks.cleanup_task",
         "schedule": crontab(hour=0, minute=5),
     },
+    "update_dashboard_every_interval": {
+        "task": "monitoring.tasks.update_dashboard",
+        "schedule": 5,
+    },
 }
 
 # EOF

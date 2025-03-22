@@ -12,3 +12,5 @@ pytest-mock
 requests
 lxml
 pytz
+channels
+channels-redis

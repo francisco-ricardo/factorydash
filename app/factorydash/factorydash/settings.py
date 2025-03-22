@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'monitoring',
     'django_celery_beat',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -74,6 +75,13 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'factorydash.urls'
 WSGI_APPLICATION = 'factorydash.wsgi.application'
+ASGI_APPLICATION = 'factorydash.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {'hosts': [(os.getenv('CELERY_BROKER_URL').split('://')[1])]},
+    },
+}
 
 TEMPLATES = [
     {
