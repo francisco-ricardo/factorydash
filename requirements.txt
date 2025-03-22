@@ -14,3 +14,4 @@ lxml
 pytz
 channels
 channels-redis
+daphne

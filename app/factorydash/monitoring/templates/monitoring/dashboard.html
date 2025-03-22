@@ -81,14 +81,26 @@
         });
 
         // WebSocket for real-time updates
-        const socket = new WebSocket('ws://' + window.location.host + '/ws/dashboard/');
+        // const socket = new WebSocket('ws://' + window.location.host + '/ws/dashboard/');
+        // socket.onmessage = function(e) {
+        //     const data = JSON.parse(e.data);
+        //     document.getElementById('last-updated').innerText = data.last_updated;
+        //     if (data.temperature) document.getElementById('temperature').innerText = data.temperature;
+        //     if (data.spindle_speed) document.getElementById('spindle_speed').innerText = data.spindle_speed;
+        //     // Add more metric updates as needed
+        // };
+        const socketProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+        const socket = new WebSocket(socketProtocol + window.location.host + '/ws/dashboard/');
         socket.onmessage = function(e) {
             const data = JSON.parse(e.data);
             document.getElementById('last-updated').innerText = data.last_updated;
             if (data.temperature) document.getElementById('temperature').innerText = data.temperature;
             if (data.spindle_speed) document.getElementById('spindle_speed').innerText = data.spindle_speed;
-            // Add more metric updates as needed
+            // Add more metric updates as needed};
+        socket.onerror = function(e) {
+            console.error('WebSocket error:', e);
         };
+
     </script>
 </body>
 </html>
