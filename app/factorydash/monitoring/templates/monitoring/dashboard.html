@@ -67,39 +67,39 @@
     </div>
     <script>
         // Chart.js for sample data
-        const ctx = document.getElementById('forceChart').getContext('2d');
-        const forceChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: [{% for entry in data %}'{{ entry.timestamp|date:"H:i" }}',{% endfor %}],
-                datasets: [{
-                    label: 'Sample Values',
-                    data: [{% for entry in data %}{% if entry.data_type == 'Samples' %}{{ entry.value|floatformat:2 }},{% endif %}{% endfor %}],
-                    borderColor: 'blue',
-                }]
-            }
-        });
+        // const ctx = document.getElementById('forceChart').getContext('2d');
+        // const forceChart = new Chart(ctx, {
+        //     type: 'line',
+        //     data: {
+        //         labels: [{% for entry in data %}'{{ entry.timestamp|date:"H:i" }}',{% endfor %}],
+        //         datasets: [{
+        //             label: 'Sample Values',
+        //             data: [{% for entry in data %}{% if entry.data_type == 'Samples' %}{{ entry.value|floatformat:2 }},{% endif %}{% endfor %}],
+        //             borderColor: 'blue',
+        //         }]
+        //     }
+        // });
 
         // WebSocket for real-time updates
-        // const socket = new WebSocket('ws://' + window.location.host + '/ws/dashboard/');
-        // socket.onmessage = function(e) {
-        //     const data = JSON.parse(e.data);
-        //     document.getElementById('last-updated').innerText = data.last_updated;
-        //     if (data.temperature) document.getElementById('temperature').innerText = data.temperature;
-        //     if (data.spindle_speed) document.getElementById('spindle_speed').innerText = data.spindle_speed;
-        //     // Add more metric updates as needed
-        // };
         const socketProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-        const socket = new WebSocket(socketProtocol + window.location.host + '/ws/dashboard/');
+        const socketHost = window.location.host || '127.0.0.1:8080';  // Fallback for local dev
+        const socket = new WebSocket(`${socketProtocol}${socketHost}/ws/dashboard/`);
+        socket.onopen = function() { console.log('WebSocket connected'); };
         socket.onmessage = function(e) {
-            const data = JSON.parse(e.data);
-            document.getElementById('last-updated').innerText = data.last_updated;
-            if (data.temperature) document.getElementById('temperature').innerText = data.temperature;
-            if (data.spindle_speed) document.getElementById('spindle_speed').innerText = data.spindle_speed;
-            // Add more metric updates as needed};
-        socket.onerror = function(e) {
-            console.error('WebSocket error:', e);
+            console.log('Message received:', e.data);
+            try {
+                const data = e.data ? JSON.parse(e.data) : { last_updated: 'N/A' };
+                document.getElementById('last-updated').innerText = data.last_updated || 'N/A';
+                if (data.temperature) 
+                    document.getElementById('temperature').innerText = data.temperature;
+                if (data.spindle_speed) 
+                    document.getElementById('spindle_speed').innerText = data.spindle_speed;
+            } catch (err) {
+                console.error('JSON parse error:', err, 'Raw data:', e.data);
+            }
         };
+        socket.onerror = function(e) { console.error('WebSocket error:', e); };
+        socket.onclose = function(e) { console.log('WebSocket closed:', e); };
 
     </script>
 </body>

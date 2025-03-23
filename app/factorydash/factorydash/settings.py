@@ -47,7 +47,7 @@ DATABASES['default']['CONN_MAX_AGE'] = 600
 DATA_RETENTION_DAYS = int(os.getenv("DATA_RETENTION_DAYS", "2"))
 
 # Celery configuration
-CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://redis:6379/0')
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', CELERY_BROKER_URL)
 
 # Application definition
@@ -65,6 +65,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -72,6 +73,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 ROOT_URLCONF = 'factorydash.urls'
 WSGI_APPLICATION = 'factorydash.wsgi.application'
@@ -79,7 +81,9 @@ ASGI_APPLICATION = 'factorydash.asgi.application'
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {'hosts': [(os.getenv('CELERY_BROKER_URL').split('://')[1])]},
+        'CONFIG': {
+            'hosts': [os.getenv('CELERY_BROKER_URL')],
+        },
     },
 }
 
@@ -116,6 +120,7 @@ USE_TZ = True
 # Static files
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+#STATICFILES_DIRS = [BASE_DIR / 'static']  # If custom static files exist
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
