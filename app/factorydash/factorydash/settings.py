@@ -49,6 +49,7 @@ DATA_RETENTION_DAYS = int(os.getenv("DATA_RETENTION_DAYS", "2"))
 # Celery configuration
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', CELERY_BROKER_URL)
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 # Application definition
 INSTALLED_APPS = [

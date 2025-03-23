@@ -6,10 +6,13 @@ Consumers handle real-time updates for the dashboard via
 Django Channels.
 """
 import factorydash # For logging
+
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import MachineData
 from asgiref.sync import sync_to_async
+from django.utils import timezone
+from datetime import timedelta
 from typing import Dict, Any
 
 class DashboardConsumer(AsyncWebsocketConsumer):
@@ -55,12 +58,23 @@ class DashboardConsumer(AsyncWebsocketConsumer):
             event (Dict[str, Any]): The event data from the channel layer.
         """
         try:
-            # Wrap sync ORM call in sync_to_async
+            # Get metrics from the last minute
+            cutoff = timezone.now() - timedelta(minutes=1)
+            metrics_qs = await sync_to_async(
+                lambda: MachineData.objects.filter(timestamp__gte=cutoff).order_by('-timestamp')
+            )()
+            metrics_dict = await sync_to_async(
+                lambda: {m.name.lower(): m.value for m in metrics_qs[:10]}
+            )()
+
             latest = await sync_to_async(MachineData.objects.latest)('timestamp')
             data = {
                 'last_updated': latest.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
-                'temperature': latest.value if latest.name == 'temperature' else 'N/A',
-                'spindle_speed': latest.value if latest.name == 'spindle_speed' else 'N/A',
+                'temperature': metrics_dict.get('temperature', 'N/A'),
+                'spindle_speed': metrics_dict.get('spindle_speed', 'N/A'),
+                'data_item_id': metrics_dict.get('data_item_id', 'N/A'),
+                #'temperature': latest.value if latest.name == 'temperature' else 'N/A',
+                #'spindle_speed': latest.value if latest.name == 'spindle_speed' else 'N/A',
             }
             factorydash.logger.info(f"Sending update: {data}")
             await self.send(text_data=json.dumps(data))
@@ -70,8 +84,10 @@ class DashboardConsumer(AsyncWebsocketConsumer):
                 'last_updated': 'N/A',
                 'temperature': 'N/A',
                 'spindle_speed': 'N/A',
+                'data_item_id': 'N/A',
             }))
         except Exception as e:
             factorydash.logger.error(f"Error in update_data: {str(e)}")
+            await self.send(text_data=json.dumps({'error': 'Server error'}))
 
     

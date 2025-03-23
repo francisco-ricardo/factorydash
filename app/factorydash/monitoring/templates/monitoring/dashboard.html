@@ -89,11 +89,15 @@
             console.log('Message received:', e.data);
             try {
                 const data = e.data ? JSON.parse(e.data) : { last_updated: 'N/A' };
-                document.getElementById('last-updated').innerText = data.last_updated || 'N/A';
-                if (data.temperature) 
-                    document.getElementById('temperature').innerText = data.temperature;
-                if (data.spindle_speed) 
-                    document.getElementById('spindle_speed').innerText = data.spindle_speed;
+                const lastUpdated = document.getElementById('last-updated');
+                if (lastUpdated) 
+                    lastUpdated.innerText = data.last_updated || 'N/A';
+                const temp = document.getElementById('temperature');
+                if (temp && data.temperature) 
+                    temp.innerText = data.temperature;
+                const spindle = document.getElementById('spindle_speed');
+                if (spindle && data.spindle_speed) 
+                    spindle.innerText = data.spindle_speed;
             } catch (err) {
                 console.error('JSON parse error:', err, 'Raw data:', e.data);
             }
