@@ -6,6 +6,7 @@ from pathlib import Path
 import os
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
+from urllib.parse import urlparse
 
 # Build paths
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,6 +22,60 @@ if not SECRET_KEY:
         raise ImproperlyConfigured("SECRET_KEY must be set in production. Check Railway variables.")
 DEBUG = not IS_PRODUCTION
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
+
+# Celery configuration
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
+if not CELERY_BROKER_URL:
+    raise ImproperlyConfigured("CELERY_BROKER_URL must be set.")
+try:
+    parsed_url = urlparse(CELERY_BROKER_URL)
+    if not parsed_url.scheme or not parsed_url.netloc:
+        raise ImproperlyConfigured("CELERY_BROKER_URL must be a valid URL (e.g., redis://host:port)")
+except ValueError as e:
+    raise ImproperlyConfigured(f"Invalid CELERY_BROKER_URL: {e}")
+
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", CELERY_BROKER_URL)
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# Fetch and validate LOAD_NIST_DATA_SCHEDULE_SECONDS
+DEFAULT_LOAD_NIST_DATA_SCHEDULE_SECONDS = 3.0
+LOAD_NIST_DATA_SCHEDULE_SECONDS = os.getenv('LOAD_NIST_DATA_SCHEDULE_SECONDS', str(DEFAULT_LOAD_NIST_DATA_SCHEDULE_SECONDS))
+try:
+    LOAD_NIST_DATA_SCHEDULE_SECONDS = float(LOAD_NIST_DATA_SCHEDULE_SECONDS)
+    if LOAD_NIST_DATA_SCHEDULE_SECONDS <= 0:
+        raise ValueError("LOAD_NIST_DATA_SCHEDULE_SECONDS must be a positive number")
+except ValueError as e:
+    raise ValueError(f"Invalid LOAD_NIST_DATA_SCHEDULE_SECONDS: {e}")
+
+# Fetch and validate UPDATE_DASHBOARD_SCHEDULE_SECONDS
+DEFAULT_UPDATE_DASHBOARD_SCHEDULE_SECONDS = 5.0
+UPDATE_DASHBOARD_SCHEDULE_SECONDS = os.getenv("UPDATE_DASHBOARD_SCHEDULE_SECONDS", str(DEFAULT_UPDATE_DASHBOARD_SCHEDULE_SECONDS))
+try:
+    UPDATE_DASHBOARD_SCHEDULE_SECONDS = float(UPDATE_DASHBOARD_SCHEDULE_SECONDS)
+    if UPDATE_DASHBOARD_SCHEDULE_SECONDS <= 0:
+        raise ValueError("UPDATE_DASHBOARD_SCHEDULE_SECONDS must be a positive number")
+except ValueError as e:
+    raise ValueError(f"Invalid UPDATE_DASHBOARD_SCHEDULE_SECONDS: {e}")
+
+# Fetch and validate CLEANUP_OLD_DATA_SCHEDULE_HOURS
+DEFAULT_CLEANUP_OLD_DATA_SCHEDULE_HOURS = 1
+CLEANUP_OLD_DATA_SCHEDULE_HOURS = os.getenv("CLEANUP_OLD_DATA_SCHEDULE_HOURS", str(DEFAULT_CLEANUP_OLD_DATA_SCHEDULE_HOURS))
+try:
+    CLEANUP_OLD_DATA_SCHEDULE_HOURS = int(CLEANUP_OLD_DATA_SCHEDULE_HOURS)
+    if CLEANUP_OLD_DATA_SCHEDULE_HOURS <= 0:
+        raise ValueError("CLEANUP_OLD_DATA_SCHEDULE_HOURS must be a positive number")
+except ValueError as e:
+    raise ValueError(f"Invalid CLEANUP_OLD_DATA_SCHEDULE_HOURS: {e}")
+
+# Fetch and validate DATA_RETENTION_DAYS
+DEFAULT_DATA_RETENTION_DAYS = 2
+DATA_RETENTION_DAYS = os.getenv("DATA_RETENTION_DAYS", str(DEFAULT_DATA_RETENTION_DAYS))
+try:
+    DATA_RETENTION_DAYS = int(DATA_RETENTION_DAYS)
+    if DATA_RETENTION_DAYS <= 0:
+        raise ValueError("DATA_RETENTION_DAYS must be a positive integer")        
+except ValueError as e:
+    raise ValueError(f"Invalid DATA_RETENTION_DAYS: {e}")
 
 
 # Database configuration
@@ -42,14 +97,6 @@ except ValueError as e:
 
 # Persist connections for 10 minutes to reduce connection overhead
 DATABASES['default']['CONN_MAX_AGE'] = 600
-
-# Data retention policy
-DATA_RETENTION_DAYS = int(os.getenv("DATA_RETENTION_DAYS", "2"))
-
-# Celery configuration
-CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
-CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', CELERY_BROKER_URL)
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 # Application definition
 INSTALLED_APPS = [
@@ -83,7 +130,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [os.getenv('CELERY_BROKER_URL')],
+            'hosts': [CELERY_BROKER_URL],
         },
     },
 }
@@ -121,7 +168,6 @@ USE_TZ = True
 # Static files
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-#STATICFILES_DIRS = [BASE_DIR / 'static']  # If custom static files exist
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

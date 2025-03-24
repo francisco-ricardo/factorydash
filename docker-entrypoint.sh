@@ -42,6 +42,10 @@ main() {
     echo "Collecting static files..."
     python app/factorydash/manage.py collectstatic --noinput
 
+    # Create periodic tasks
+    echo "Setting up periodic tasks..."
+    python app/factorydash/manage.py setup_periodic_tasks
+
 }
 
 

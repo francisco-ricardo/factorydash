@@ -19,7 +19,12 @@ else
 fi
 
 # Check the integrity of the Django project
+echo "Checking Django project integrity..."
 python /factorydash/app/factorydash/manage.py check
+
+# Create periodic tasks
+echo "Setting up periodic tasks..."
+python /factorydash/app/factorydash/manage.py setup_periodic_tasks
 
 exec "$@"
 
