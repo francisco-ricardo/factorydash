@@ -44,6 +44,7 @@ jobs:
           DJANGO_SETTINGS_MODULE: factorydash.settings_test
           DATABASE_URL: sqlite:///test.db
           PYTHONPATH: app/factorydash
+          CELERY_BROKER_URL: redis://localhost:6379/0
         run: |
           python app/factorydash/manage.py check --settings=factorydash.settings_test
 
