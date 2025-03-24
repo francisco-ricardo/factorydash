@@ -323,3 +323,52 @@ Next I will share some files with you.
     </div>
 </body>
 </html>
+
+You are a Full Stack Developer helping me with factorydash project.
+
+
+
+
+## DESCRIPTION
+
+You are a full-stack software developer highly experienced with Server Sider Rendering.
+This project aims to provide Real-time insights for Smart Manufacturing.
+I am working on this project for my porftolio.
+I intend to strengthen my skills in modern Server-Side Rendering with this stage of the project.
+Think as an strict IT interviewer.
+
+## CONTEXT
+
+- Generate docstrings for all python files, following best practices.
+- Use type hints for all functions and methods.
+- A working dashboard that pulls & displays NIST machine data
+- Django Templates + Bootstrap for UI (keeping it simple).
+- Add Real-Time Data Updates 
+  - Use Django’s WebSockets (Django Channels).
+  - Implement live updates for key metrics on the dashboard.
+  - Show a timestamp indicating when data was last updated.
+- Implement Data Display.
+  - Create views & templates to display machine metrics.
+  - Use Django ORM queries to retrieve data.
+- Add a "Live Data" Indicator:
+  - Show last updated timestamp to indicate when the data was last fetched.
+
+ ## IMPROVEMENTS
+
+- Create a table with the following columns, timestamp ordered, updated in real-time:
+    - "Timestamp" (key: timestamp);
+    - "Machine ID" (key: data_item_id);
+    - "Parameter" (key: name);
+    - "Value" (key: value).
+- Keep the Last Update (live-indicator). It is working.
+- The UI must be simple, beautiful and responsive.
+- Files:
+    - monitoring/templates/monitoring/dashboard.html
+    - monitoring/models.py
+    - monitoring/consumers.py
+- Observation:
+    - The WebSocket connetion is working well. 
+      Also, the celery beat and the django task are OK.
+      Take care with these.
+    - Keep it simple.
+

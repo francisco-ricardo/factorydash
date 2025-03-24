@@ -7,104 +7,78 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/">FactoryDash</a>
-            <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link" href="/">Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="/health/">Health</a></li>
-            </ul>
-        </div>
-    </nav>
     <div class="container mt-4">
         <h1>Real-Time Manufacturing Dashboard</h1>
+
+        <!-- Last Updated Indicator -->
         <div class="mb-3">
-            <form method="GET" class="d-inline">
-                <select name="range" onchange="this.form.submit()" class="form-select d-inline w-auto">
-                    <option value="hour" {% if time_range == 'hour' %}selected{% endif %}>Last Hour</option>
-                    <option value="day" {% if time_range == 'day' %}selected{% endif %}>Last Day</option>
-                    <option value="week" {% if time_range == 'week' %}selected{% endif %}>Last Week</option>
-                </select>
-            </form>
             <small>Last Updated: <span id="last-updated">{% if last_updated %}{{ last_updated|date:"Y-m-d H:i:s" }}{% else %}N/A{% endif %}</span></small>
             <span id="live-indicator" class="badge bg-success ms-2">Live</span>
         </div>
-        <div class="row">
-            {% for metric in latest_metrics %}
-            <div class="col-md-4 mb-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ metric.name|title }}</h5>
-                        <p class="card-text" id="{{ metric.name }}">{{ metric.value }}</p>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+
+        <!-- Data Table -->
         <div class="row mt-4">
             <div class="col">
-                <canvas id="forceChart"></canvas>
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Machine ID</th>
+                            <th>Parameter</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-table">
+                        <!-- Table rows will be added here by JavaScript -->
+                    </tbody>
+                </table>
             </div>
         </div>
-        <table class="table mt-4">
-            <thead>
-                <tr>
-                    <th>Timestamp</th>
-                    <th>Data Item</th>
-                    <th>Value</th>
-                </tr>
-            </thead>
-            <tbody id="data-table">
-                {% for entry in data %}
-                <tr>
-                    <td>{{ entry.timestamp|date:"H:i:s" }}</td>
-                    <td>{{ entry.name }}</td>
-                    <td>{{ entry.value }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
     </div>
-    <script>
-        // Chart.js for sample data
-        // const ctx = document.getElementById('forceChart').getContext('2d');
-        // const forceChart = new Chart(ctx, {
-        //     type: 'line',
-        //     data: {
-        //         labels: [{% for entry in data %}'{{ entry.timestamp|date:"H:i" }}',{% endfor %}],
-        //         datasets: [{
-        //             label: 'Sample Values',
-        //             data: [{% for entry in data %}{% if entry.data_type == 'Samples' %}{{ entry.value|floatformat:2 }},{% endif %}{% endfor %}],
-        //             borderColor: 'blue',
-        //         }]
-        //     }
-        // });
 
+    <script>
         // WebSocket for real-time updates
         const socketProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
         const socketHost = window.location.host || '127.0.0.1:8080';  // Fallback for local dev
         const socket = new WebSocket(`${socketProtocol}${socketHost}/ws/dashboard/`);
+
         socket.onopen = function() { console.log('WebSocket connected'); };
+
         socket.onmessage = function(e) {
             console.log('Message received:', e.data);
             try {
-                const data = e.data ? JSON.parse(e.data) : { last_updated: 'N/A' };
+                const data = JSON.parse(e.data);
+
+                // Update Last Updated
                 const lastUpdated = document.getElementById('last-updated');
-                if (lastUpdated) 
+                if (lastUpdated) {
                     lastUpdated.innerText = data.last_updated || 'N/A';
-                const temp = document.getElementById('temperature');
-                if (temp && data.temperature) 
-                    temp.innerText = data.temperature;
-                const spindle = document.getElementById('spindle_speed');
-                if (spindle && data.spindle_speed) 
-                    spindle.innerText = data.spindle_speed;
+                }
+
+                // Update Table
+                const tableBody = document.getElementById('data-table');
+                if (tableBody && data.table_data) {
+                    tableBody.innerHTML = ''; // Clear existing rows
+                    data.table_data.forEach(item => {
+                        const row = tableBody.insertRow();
+                        const timestampCell = row.insertCell();
+                        const machineIdCell = row.insertCell();
+                        const parameterCell = row.insertCell();
+                        const valueCell = row.insertCell();
+
+                        timestampCell.innerText = item.timestamp;
+                        machineIdCell.innerText = item.data_item_id;
+                        parameterCell.innerText = item.name;
+                        valueCell.innerText = item.value;
+                    });
+                }
             } catch (err) {
                 console.error('JSON parse error:', err, 'Raw data:', e.data);
             }
         };
+
         socket.onerror = function(e) { console.error('WebSocket error:', e); };
         socket.onclose = function(e) { console.log('WebSocket closed:', e); };
-
     </script>
 </body>
 </html>
