@@ -32,6 +32,10 @@
                         <!-- Table rows will be added here by JavaScript -->
                     </tbody>
                 </table>
+                <div id="pagination-controls" class="mt-2">
+                    <button id="prev-page" class="btn btn-secondary me-2" disabled>Previous</button>
+                    <button id="next-page" class="btn btn-secondary">Next</button>
+                </div>
             </div>
         </div>
     </div>
@@ -41,37 +45,24 @@
         const socketProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
         const socketHost = window.location.host || '127.0.0.1:8080';  // Fallback for local dev
         const socket = new WebSocket(`${socketProtocol}${socketHost}/ws/dashboard/`);
+        let currentPage = 1;
+        let hasMorePages = true;
 
-        socket.onopen = function() { console.log('WebSocket connected'); };
+        socket.onopen = function() { 
+            console.log('WebSocket connected'); 
+            fetchData(currentPage);            
+        };
 
         socket.onmessage = function(e) {
             console.log('Message received:', e.data);
             try {
                 const data = JSON.parse(e.data);
 
-                // Update Last Updated
-                const lastUpdated = document.getElementById('last-updated');
-                if (lastUpdated) {
-                    lastUpdated.innerText = data.last_updated || 'N/A';
-                }
+                updateLastUpdated(data.last_updated);
+                updateTable(data.table_data);
+                hasMorePages = data.has_more;
+                updatePagination();
 
-                // Update Table
-                const tableBody = document.getElementById('data-table');
-                if (tableBody && data.table_data) {
-                    tableBody.innerHTML = ''; // Clear existing rows
-                    data.table_data.forEach(item => {
-                        const row = tableBody.insertRow();
-                        const timestampCell = row.insertCell();
-                        const machineIdCell = row.insertCell();
-                        const parameterCell = row.insertCell();
-                        const valueCell = row.insertCell();
-
-                        timestampCell.innerText = item.timestamp;
-                        machineIdCell.innerText = item.data_item_id;
-                        parameterCell.innerText = item.name;
-                        valueCell.innerText = item.value;
-                    });
-                }
             } catch (err) {
                 console.error('JSON parse error:', err, 'Raw data:', e.data);
             }
@@ -79,6 +70,51 @@
 
         socket.onerror = function(e) { console.error('WebSocket error:', e); };
         socket.onclose = function(e) { console.log('WebSocket closed:', e); };
+
+
+        function fetchData(page) {
+            // You might not need to send anything here if the server is pushing updates automatically.
+            // If you need to request a specific page, send a message to the server.
+            // Example: socket.send(JSON.stringify({ page }));
+        }
+
+        function updateLastUpdated(lastUpdated) {
+            document.getElementById('last-updated').innerText = lastUpdated || 'N/A';
+        }
+
+        function updateTable(tableData) {
+            const tableBody = document.getElementById('data-table').querySelector('tbody');
+            tableBody.innerHTML = '';
+            tableData.forEach(item => {
+                const row = tableBody.insertRow();
+                row.insertCell().innerText = item.timestamp;
+                row.insertCell().innerText = item.data_item_id;
+                row.insertCell().innerText = item.name;
+                row.insertCell().innerText = item.value;
+            });
+        }
+
+        function updatePagination() {
+            const previousButton = document.getElementById('prev-page');
+            const nextButton = document.getElementById('next-page');
+
+            prevButton.disabled = currentPage === 1;
+            nextButton.disabled = !hasMorePages;
+
+            prevButton.onclick = () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    fetchData(currentPage);
+                }
+            };
+
+            nextButton.onclick = () => {
+                if (hasMorePages) {
+                    currentPage++;
+                    fetchData(currentPage);
+                }
+            };
+        }        
     </script>
 </body>
 </html>

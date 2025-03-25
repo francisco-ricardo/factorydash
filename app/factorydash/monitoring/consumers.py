@@ -62,6 +62,57 @@ class DashboardConsumer(AsyncWebsocketConsumer):
             latest = await sync_to_async(MachineData.objects.latest)('timestamp')
             last_updated_str = latest.timestamp.strftime('%Y-%m-%d %H:%M:%S')
 
+            # Pagination parameters
+            page_size = 20  # Adjust as needed
+            page_number = 1 # Manage this from the frontend
+
+            # Fetch a page of data
+            latest_entries = await sync_to_async(
+                lambda: MachineData.objects.order_by('-timestamp')
+                .values('timestamp', 'data_item_id', 'name', 'value')
+                .distinct('name') # Avoid duplicate names
+                [(page_number - 1) * page_size:page_number * page_size]
+            )()
+
+            table_data = list(latest_entries) # Convert QuerySet to list
+
+            data = {
+                'last_updated': last_updated_str,
+                'table_data': table_data,
+                'has_more': len(latest_entries) == page_size # Indicate if more pages exist
+            }
+
+            await self.send(text_data=json.dumps(data))
+
+        except MachineData.DoesNotExist:
+            factorydash.logger.warning("No MachineData available to send")
+            await self.send(text_data=json.dumps({
+                'last_updated': 'N/A',
+                'table_data': [],
+                'has_more': False,
+            }))
+
+        except Exception as e:
+            factorydash.logger.error(f"Error in update_data: {str(e)}")
+            await self.send(text_data=json.dumps({'error': 'Server error'}))
+
+        else:
+            factorydash.logger.info(f"Data updated: {data}")
+
+
+
+
+    async def update_data_orig(self, event: Dict[str, Any]) -> None:
+        """
+        Sends updated machine data to the client.
+
+        Args:
+            event (Dict[str, Any]): The event data from the channel layer.
+        """
+        try:
+            latest = await sync_to_async(MachineData.objects.latest)('timestamp')
+            last_updated_str = latest.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+
             all_entries = await sync_to_async(
                 lambda: list(MachineData.objects.order_by('name', '-timestamp').all())
             )()
