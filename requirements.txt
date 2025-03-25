@@ -1,6 +1,5 @@
 django
 dj-database-url
-gunicorn
 psycopg2-binary
 celery
 redis
