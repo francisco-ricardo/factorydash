@@ -4,31 +4,29 @@
     <meta charset="UTF-8">
     <title>FactoryDash - Real-Time Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container mt-4">
-        <h1>Real-Time Manufacturing Dashboard</h1>
+        <h1>FactoryDash 2.0 - Real-Time Manufacturing Dashboard</h1>
 
-        <!-- Last Updated Indicator -->
         <div class="mb-3">
-            <small>Last Updated: <span id="last-updated">{% if last_updated %}{{ last_updated|date:"Y-m-d H:i:s" }}{% else %}N/A{% endif %}</span></small>
+            <small>Last Updated: <span id="last-updated">N/A</span></small>
             <span id="live-indicator" class="badge bg-success ms-2">Live</span>
         </div>
 
-        <!-- Data Table -->
         <div class="row mt-4">
             <div class="col">
-                <table class="table table-striped table-hover">
+                <table class="table table-striped table-hover" id="data-table">
                     <thead>
                         <tr>
                             <th>Timestamp</th>
                             <th>Machine ID</th>
+                            <th>Data Type</th>
                             <th>Parameter</th>
                             <th>Value</th>
                         </tr>
                     </thead>
-                    <tbody id="data-table">
+                    <tbody>
                         <!-- Table rows will be added here by JavaScript -->
                     </tbody>
                 </table>
@@ -41,80 +39,112 @@
     </div>
 
     <script>
-        // WebSocket for real-time updates
-        const socketProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-        const socketHost = window.location.host || '127.0.0.1:8080';  // Fallback for local dev
-        const socket = new WebSocket(`${socketProtocol}${socketHost}/ws/dashboard/`);
-        let currentPage = 1;
-        let hasMorePages = true;
+        document.addEventListener('DOMContentLoaded', () => {
+            const socketProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+            const socketHost = window.location.host || '127.0.0.1:8080';
+            const socket = new WebSocket(`${socketProtocol}${socketHost}/ws/dashboard/`);
+            
+            let currentPage = 1;
+            let hasMorePages = true;
 
-        socket.onopen = function() { 
-            console.log('WebSocket connected'); 
-            fetchData(currentPage);            
-        };
-
-        socket.onmessage = function(e) {
-            console.log('Message received:', e.data);
-            try {
-                const data = JSON.parse(e.data);
-
-                updateLastUpdated(data.last_updated);
-                updateTable(data.table_data);
-                hasMorePages = data.has_more;
-                updatePagination();
-
-            } catch (err) {
-                console.error('JSON parse error:', err, 'Raw data:', e.data);
-            }
-        };
-
-        socket.onerror = function(e) { console.error('WebSocket error:', e); };
-        socket.onclose = function(e) { console.log('WebSocket closed:', e); };
-
-
-        function fetchData(page) {
-            // You might not need to send anything here if the server is pushing updates automatically.
-            // If you need to request a specific page, send a message to the server.
-            // Example: socket.send(JSON.stringify({ page }));
-        }
-
-        function updateLastUpdated(lastUpdated) {
-            document.getElementById('last-updated').innerText = lastUpdated || 'N/A';
-        }
-
-        function updateTable(tableData) {
             const tableBody = document.getElementById('data-table').querySelector('tbody');
-            tableBody.innerHTML = '';
-            tableData.forEach(item => {
-                const row = tableBody.insertRow();
-                row.insertCell().innerText = item.timestamp;
-                row.insertCell().innerText = item.data_item_id;
-                row.insertCell().innerText = item.name;
-                row.insertCell().innerText = item.value;
-            });
-        }
-
-        function updatePagination() {
-            const previousButton = document.getElementById('prev-page');
+            const lastUpdatedSpan = document.getElementById('last-updated');
+            const prevButton = document.getElementById('prev-page');
             const nextButton = document.getElementById('next-page');
 
-            prevButton.disabled = currentPage === 1;
-            nextButton.disabled = !hasMorePages;
+            socket.onopen = function() { 
+                console.log('WebSocket connected'); 
+                fetchData(currentPage);            
+            };
 
-            prevButton.onclick = () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    fetchData(currentPage);
+            socket.onmessage = function(e) {
+                try {
+                    const data = JSON.parse(e.data);
+
+                    // Detailed error logging
+                    if (data.error) {
+                        console.error('Received server error:', data.error);
+                        return;
+                    }
+
+                    // Validate received data
+                    if (!data.last_updated || !Array.isArray(data.table_data)) {
+                        console.error('Invalid data received:', data);
+                        return;
+                    }
+
+                    updateLastUpdated(data.last_updated);
+                    updateTable(data.table_data);
+                    hasMorePages = data.has_more;
+                    updatePagination();
+
+                } catch (err) {
+                    console.error('Error processing WebSocket message:', err);
+                    console.error('Raw received data:', e.data);
                 }
             };
 
-            nextButton.onclick = () => {
-                if (hasMorePages) {
-                    currentPage++;
-                    fetchData(currentPage);
-                }
+            socket.onerror = function(e) { 
+                console.error('WebSocket connection error:', e); 
             };
-        }        
+
+            socket.onclose = function(e) { 
+                console.log('WebSocket closed:', e); 
+                // Optional: Attempt to reconnect
+                setTimeout(() => {
+                    console.log('Attempting to reconnect...');
+                    window.location.reload();
+                }, 5000);
+            };
+
+            function fetchData(page) {
+                if (socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({ page }));
+                } else {
+                    console.error('WebSocket is not open. Current state:', socket.readyState);
+                }
+            }
+
+            function updateLastUpdated(lastUpdated) {
+                lastUpdatedSpan.textContent = lastUpdated || 'N/A';
+            }
+
+            function updateTable(tableData) {
+                if (!tableBody) {
+                    console.error("Table body not found");
+                    return;
+                }
+
+                tableBody.innerHTML = '';
+                (tableData || []).forEach(item => {
+                    const row = tableBody.insertRow();
+                    row.insertCell().textContent = item.timestamp || 'N/A';
+                    row.insertCell().textContent = item.data_item_id || 'N/A';
+                    row.insertCell().textContent = item.data_type || 'N/A';
+                    row.insertCell().textContent = item.name || 'N/A';
+                    row.insertCell().textContent = item.value || 'N/A';
+                });
+            }
+
+            function updatePagination() {
+                prevButton.disabled = currentPage === 1;
+                nextButton.disabled = !hasMorePages;
+
+                prevButton.onclick = () => {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        fetchData(currentPage);
+                    }
+                };
+
+                nextButton.onclick = () => {
+                    if (hasMorePages) {
+                        currentPage++;
+                        fetchData(currentPage);
+                    }
+                };
+            }
+        });     
     </script>
 </body>
 </html>

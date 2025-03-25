@@ -8,11 +8,12 @@ Django Channels.
 import factorydash # For logging
 
 import json
+from django.utils import timezone
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import MachineData
 from asgiref.sync import sync_to_async
-from django.utils import timezone
-from datetime import timedelta
+from django.db.models import Window, F
+from django.db.models.functions import RowNumber
 from typing import Dict, Any
 
 class DashboardConsumer(AsyncWebsocketConsumer):
@@ -51,109 +52,69 @@ class DashboardConsumer(AsyncWebsocketConsumer):
         factorydash.logger.info(f"WebSocket disconnected with code: {close_code}")
 
 
-    async def update_data(self, event: Dict[str, Any]) -> None:
+    async def receive(self, text_data):
         """
-        Sends updated machine data to the client.
+        Handles receiving messages from the client.
 
-        Args:
-            event (Dict[str, Any]): The event data from the channel layer.
+        Expects a JSON payload with page number.
         """
         try:
-            latest = await sync_to_async(MachineData.objects.latest)('timestamp')
-            last_updated_str = latest.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+            data = json.loads(text_data)
+            page_number = data.get('page', 1)
+            await self.send_dashboard_data(page_number)
+        except json.JSONDecodeError:
+            await self.send(text_data=json.dumps({'error': 'Invalid JSON'}))
+        except Exception as e:
+            factorydash.logger.error(f"WebSocket receive error: {str(e)}")
+            await self.send(text_data=json.dumps({'error': 'Server error'}))
 
-            # Pagination parameters
-            page_size = 20  # Adjust as needed
-            page_number = 1 # Manage this from the frontend
 
-            # Fetch a page of data
+    async def send_dashboard_data(self, page_number: int = 1) -> None:
+        """
+        Sends updated machine data to the client with pagination.
+
+        Args:
+            page_number (int): The number of the page to fetch data from.
+        """
+        try:
+            page_size = 20
+            offset = (page_number - 1) * page_size
+
+            # Get the latest overall timestamp
+            latest_timestamp = await sync_to_async(
+                lambda: MachineData.objects.latest('timestamp').timestamp 
+                if MachineData.objects.exists() else timezone.now()
+            )()
+            last_updated_str = latest_timestamp.strftime('%Y-%m-%d %H:%M:%S')
+
+            # Fetch latest entries, prioritizing most recent unique data items
             latest_entries = await sync_to_async(
-                lambda: MachineData.objects.order_by('-timestamp')
-                .values('timestamp', 'data_item_id', 'name', 'value')
-                .distinct('name') # Avoid duplicate names
-                [(page_number - 1) * page_size:page_number * page_size]
+                lambda: list(
+                    MachineData.objects.annotate(
+                        row_num=Window(
+                            expression=RowNumber(),
+                            partition_by=[F('data_item_id'), F('name')],
+                            order_by=F('timestamp').desc()
+                        )
+                    )
+                    .filter(row_num=1)
+                    .order_by('-timestamp')
+                    .values('timestamp', 'data_item_id', 'name', 'value', 'data_type')
+                    [offset:offset+page_size]
+                )
             )()
-
-            table_data = list(latest_entries) # Convert QuerySet to list
 
             data = {
                 'last_updated': last_updated_str,
-                'table_data': table_data,
-                'has_more': len(latest_entries) == page_size # Indicate if more pages exist
+                'table_data': latest_entries,
+                'has_more': len(latest_entries) == page_size,
             }
 
-            await self.send(text_data=json.dumps(data))
-
-        except MachineData.DoesNotExist:
-            factorydash.logger.warning("No MachineData available to send")
-            await self.send(text_data=json.dumps({
-                'last_updated': 'N/A',
-                'table_data': [],
-                'has_more': False,
-            }))
+            await self.send(text_data=json.dumps(data, default=str))
 
         except Exception as e:
-            factorydash.logger.error(f"Error in update_data: {str(e)}")
-            await self.send(text_data=json.dumps({'error': 'Server error'}))
-
-        else:
-            factorydash.logger.info(f"Data updated: {data}")
+            factorydash.logger.error(f"Error in send_dashboard_data: {str(e)}")
+            await self.send(text_data=json.dumps({'error': str(e)}))
 
 
 
-
-    async def update_data_orig(self, event: Dict[str, Any]) -> None:
-        """
-        Sends updated machine data to the client.
-
-        Args:
-            event (Dict[str, Any]): The event data from the channel layer.
-        """
-        try:
-            latest = await sync_to_async(MachineData.objects.latest)('timestamp')
-            last_updated_str = latest.timestamp.strftime('%Y-%m-%d %H:%M:%S')
-
-            all_entries = await sync_to_async(
-                lambda: list(MachineData.objects.order_by('name', '-timestamp').all())
-            )()
-
-            latest_entries_dict: Dict[str, MachineData] = {}
-            for entry in all_entries:
-                if entry.name not in latest_entries_dict:
-                    latest_entries_dict[entry.name] = entry
-
-            # Sort by data_item_id and then by timestamp
-            sorted_entries = sorted(
-                latest_entries_dict.values(),
-                key=lambda entry: (entry.data_item_id, -entry.timestamp.timestamp())
-            )
-
-            table_data: List[Dict[str, Any]] = []
-            for entry in sorted_entries:
-                table_data.append({
-                    'timestamp': entry.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
-                    'data_item_id': entry.data_item_id,
-                    'name': entry.name,
-                    'value': entry.value,
-                })
-
-            data = {
-                'last_updated': last_updated_str,
-                'table_data': table_data,
-            }
-
-            await self.send(text_data=json.dumps(data))
-
-        except MachineData.DoesNotExist:
-            factorydash.logger.warning("No MachineData available to send")
-            await self.send(text_data=json.dumps({
-                'last_updated': 'N/A',
-                'table_data': [],
-            }))
-
-        except Exception as e:
-            factorydash.logger.error(f"Error in update_data: {str(e)}")
-            await self.send(text_data=json.dumps({'error': 'Server error'}))
-
-        else:
-            factorydash.logger.info(f"Data updated: {data}")

@@ -372,3 +372,82 @@ Think as an strict IT interviewer.
       Take care with these.
     - Keep it simple.
 
+
+
+Fields?
+
+<Events>
+    <Availability dataItemId="GFAgie01-dtop_1" timestamp="2025-03-25T04:00:56.124997" name="avail" sequence="594301694">AVAILABLE</Availability>
+    <EmergencyStop dataItemId="GFAgie01-dtop_2" timestamp="2025-03-25T04:00:56.125112" name="estop" sequence="594301695">ARMED</EmergencyStop>
+</Events>
+
+<ComponentStream component="Rotary" name="C" componentId="Hurco02-C">
+    <Samples>
+        <RotaryVelocity dataItemId="Hurco02-C_1" timestamp="2025-03-25T20:40:31.572214" name="Spindle_Speed" sequence="594968640" subType="ACTUAL">3105.000000</RotaryVelocity>
+    </Samples>
+    <Events>
+        <RotaryVelocityOverride dataItemId="Hurco02-C_2" timestamp="2025-03-25T20:40:31.571782" name="Spindle_Override" sequence="594968639">69.000000</RotaryVelocityOverride>
+    </Events>
+</ComponentStream>
+
+
+<ComponentStream component="Path" name="Path" componentId="Hurco02-path">
+    <Samples>
+        <PathFeedrateOverride dataItemId="Hurco02-path_10" timestamp="2025-03-25T20:40:40.774760" name="Feed_Override" sequence="594968936">90.000000</PathFeedrateOverride>
+        <PathFeedrateOverride dataItemId="Hurco02-path_11" timestamp="2025-03-25T20:10:12.495884" name="Rapid_Override" sequence="594942240" subType="RAPID">100.000000</PathFeedrateOverride>
+        <AccumulatedTime dataItemId="Hurco02-path_7" timestamp="2025-03-25T20:41:54.440824" name="Program_Runtime_Seconds" sequence="594969889">2905</AccumulatedTime>
+        <AccumulatedTime dataItemId="Hurco02-path_8" timestamp="2025-03-25T20:35:10.200871" name="Spindle_Time" sequence="594963895">7240914.1548</AccumulatedTime>
+        <PathFeedrate dataItemId="Hurco02-path_9" timestamp="2025-03-25T20:41:53.993991" name="Feed_Rate" sequence="594969876" subType="ACTUAL">20.95</PathFeedrate>
+    </Samples>
+    <Events>
+        <Line dataItemId="Hurco02-path_1" timestamp="2025-03-25T20:41:55.340769" name="Block_Number" sequence="594969904">9077</Line>
+        <Program dataItemId="Hurco02-path_2" timestamp="2025-03-25T19:50:05.170805Z" name="Program_Name_Running" sequence="594925338">UNAVAILABLE</Program>
+        <ProgramEditName dataItemId="Hurco02-path_3" timestamp="2025-03-25T19:50:05.170805Z" name="Program_Name_Editing" sequence="594925339">UNAVAILABLE</ProgramEditName>
+        <PartCount dataItemId="Hurco02-path_4" timestamp="2025-03-25T17:23:55.007469Z" name="Part_Count" sequence="594810180" subType="ALL">UNAVAILABLE</PartCount>
+        <Execution dataItemId="Hurco02-path_5" timestamp="2025-03-25T19:50:05.170805Z" name="Program_Status" sequence="594925340">UNAVAILABLE</Execution>
+        <ToolNumber dataItemId="Hurco02-path_6" timestamp="2025-03-25T20:09:19.243494" name="Current_Tool" sequence="594941454">10.000000</ToolNumber>
+    </Events>
+</ComponentStream>
+
+
+<ComponentStream component="Rotary" name="C" componentId="Hurco04-C">
+    <Samples>
+        <RotaryVelocity dataItemId="Hurco04-C_1" timestamp="2025-03-25T20:20:22.778357" name="Spindle_Speed" sequence="594951508" subType="ACTUAL">9000.000000</RotaryVelocity>
+    </Samples>
+    <Events>
+        <RotaryVelocityOverride dataItemId="Hurco04-C_2" timestamp="2025-03-25T14:05:17.267295Z" name="Spindle_Override" sequence="594620081">UNAVAILABLE</RotaryVelocityOverride>
+    </Events>
+</ComponentStream>
+
+
+<ComponentStream component="Path" name="Path" componentId="Hurco04-path">
+    <Samples>
+        <PathFeedrateOverride dataItemId="Hurco04-path_10" timestamp="2025-03-25T14:05:17.267295Z" name="Feed_Override" sequence="594620083">UNAVAILABLE</PathFeedrateOverride>
+        <PathFeedrateOverride dataItemId="Hurco04-path_11" timestamp="2025-03-25T14:35:12.873886" name="Rapid_Override" sequence="594648436" subType="RAPID">52.000000</PathFeedrateOverride>
+        <AccumulatedTime dataItemId="Hurco04-path_7" timestamp="2025-03-25T20:41:44.930071" name="Program_Runtime_Seconds" sequence="594969806">707</AccumulatedTime>
+        <AccumulatedTime dataItemId="Hurco04-path_8" timestamp="2025-03-25T20:22:49.488621" name="Spindle_Time" sequence="594953969">6682301.3088</AccumulatedTime>
+        <PathFeedrate dataItemId="Hurco04-path_9" timestamp="2025-03-25T20:41:53.778109" name="Feed_Rate" sequence="594969875" subType="ACTUAL">8.8</PathFeedrate>
+    </Samples>
+    <Events>
+        <Line dataItemId="Hurco04-path_1" timestamp="2025-03-25T20:41:55.747543" name="Block_Number" sequence="594969911">1888</Line>
+        <Program dataItemId="Hurco04-path_2" timestamp="2025-03-25T19:58:30.433737" name="Program_Name_Running" sequence="594932794">NIST_MTC_CRADA_PLATE-15.NC</Program>
+        <ProgramEditName dataItemId="Hurco04-path_3" timestamp="2025-03-25T19:58:15.946187" name="Program_Name_Editing" sequence="594932649">NIST_MTC_CRADA_PLATE-15.NC</ProgramEditName>
+        <PartCount dataItemId="Hurco04-path_4" timestamp="2025-03-25T19:55:45.484638" name="Part_Count" sequence="594930924" subType="ALL">1081</PartCount>
+        <Execution dataItemId="Hurco04-path_5" timestamp="2025-03-25T19:58:30.224917" name="Program_Status" sequence="594932793">ACTIVE</Execution>
+        <ToolNumber dataItemId="Hurco04-path_6" timestamp="2025-03-25T20:20:19.608842" name="Current_Tool" sequence="594951404">5.000000</ToolNumber>
+    </Events>
+</ComponentStream>
+
+
+
+<ComponentStream component="Rotary" name="S" componentId="Mazak03-S_1">                                                                     
+    <Samples>
+        <RotaryVelocity dataItemId="Mazak03-S_2" timestamp="2025-03-25T20:56:52.953080" name="Srpm" sequence="594980851" subType="ACTUAL">750</RotaryVelocity>
+            <Load dataItemId="Mazak03-S_3" timestamp="2025-03-25T20:56:52.953171" name="S1load" sequence="594980852">1</Load>
+            <Temperature dataItemId="Mazak03-S_4" timestamp="2025-03-25T20:56:52.953245" name="Stemp" sequence="594980853">40</Temperature>         
+    </Samples>                                                                                                                                
+    <Condition>                                                                                                                                 
+        <Normal dataItemId="Mazak03-S_5" timestamp="2025-03-25T20:56:52.953317" name="Sload_cond" sequence="594980854" type="LOAD"/>              
+        <Normal dataItemId="Mazak03-S_6" timestamp="2025-03-25T20:56:52.953397" name="Stemp_cond" sequence="594980855" type="TEMPERATURE"/>                                                                                                                                               
+    </Condition>                                                                                                                            
+</ComponentStream> 
