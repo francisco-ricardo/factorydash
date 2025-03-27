@@ -15,20 +15,12 @@ class MachineData(models.Model):
     Model representing machine data, including events and samples.
 
     Attributes:
-        data_type (str): The type of data, either 'Events' or 'Samples'.
-        data_item_id (str): Unique identifier for the data item.
+        machine_id (str): Unique identifier for the machine.
         timestamp (datetime.datetime): Timestamp when the data was recorded.
         name (Optional[str]): Name of the data item, if applicable.
         value (Optional[str]): Value of the data item, if applicable.
     """
-
-    DATA_TYPES = [
-        ('Events', 'Events'),
-        ('Samples', 'Samples'),
-    ]
-
-    data_type: str = models.CharField(max_length=10, choices=DATA_TYPES)
-    data_item_id: str = models.CharField(max_length=255)
+    machine_id: str = models.CharField(max_length=255)
     timestamp: models.DateTimeField = models.DateTimeField()
     name: Optional[str] = models.CharField(max_length=255, null=True, blank=True)
     value: Optional[str] = models.CharField(max_length=255, null=True, blank=True)
@@ -44,8 +36,7 @@ class MachineData(models.Model):
         """
         db_table: str = "machinedata"
         indexes = [
-            models.Index(fields=['timestamp']),
-            models.Index(fields=['data_item_id']),
+            models.Index(fields=['timestamp', 'machine_id', 'name']),
         ]
 
     def __str__(self):

@@ -14,7 +14,7 @@ from .models import MachineData
 from asgiref.sync import sync_to_async
 from django.db.models import Window, F
 from django.db.models.functions import RowNumber
-from typing import Dict, Any
+from typing import Any
 
 class DashboardConsumer(AsyncWebsocketConsumer):
     """
@@ -93,13 +93,13 @@ class DashboardConsumer(AsyncWebsocketConsumer):
                     MachineData.objects.annotate(
                         row_num=Window(
                             expression=RowNumber(),
-                            partition_by=[F('data_item_id'), F('name')],
+                            partition_by=[F('machine_id'), F('name')],
                             order_by=F('timestamp').desc()
                         )
                     )
                     .filter(row_num=1)
                     .order_by('-timestamp')
-                    .values('timestamp', 'data_item_id', 'name', 'value', 'data_type')
+                    .values('timestamp', 'machine_id', 'name', 'value')
                     [offset:offset+page_size]
                 )
             )()

@@ -28,8 +28,7 @@ class Command(BaseCommand):
         parsed_data = self.parse_nist_xml(xml_data)
         for entry in parsed_data:
             MachineData.objects.create(
-                data_type=entry["data_type"],
-                data_item_id=entry["data_item_id"],
+                machine_id=entry["data_item_id"],
                 timestamp=entry["timestamp"],
                 name=entry["name"],
                 value=entry["value"]

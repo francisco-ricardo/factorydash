@@ -7,7 +7,7 @@
 </head>
 <body>
     <div class="container mt-4">
-        <h1>FactoryDash 2.0 - Real-Time Manufacturing Dashboard</h1>
+        <h1>FactoryDash 3.0 - Real-Time Manufacturing Dashboard</h1>
 
         <div class="mb-3">
             <small>Last Updated: <span id="last-updated">N/A</span></small>
@@ -21,7 +21,6 @@
                         <tr>
                             <th>Timestamp</th>
                             <th>Machine ID</th>
-                            <th>Data Type</th>
                             <th>Parameter</th>
                             <th>Value</th>
                         </tr>
@@ -119,8 +118,7 @@
                 (tableData || []).forEach(item => {
                     const row = tableBody.insertRow();
                     row.insertCell().textContent = item.timestamp || 'N/A';
-                    row.insertCell().textContent = item.data_item_id || 'N/A';
-                    row.insertCell().textContent = item.data_type || 'N/A';
+                    row.insertCell().textContent = item.machine_id || 'N/A';
                     row.insertCell().textContent = item.name || 'N/A';
                     row.insertCell().textContent = item.value || 'N/A';
                 });
