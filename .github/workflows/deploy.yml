@@ -48,6 +48,14 @@ jobs:
         run: |
           python app/factorydash/manage.py check --settings=factorydash.settings_test
 
+      - name: Run database migrations
+        env:
+          DJANGO_SETTINGS_MODULE: factorydash.settings_test
+          DATABASE_URL: sqlite:///test.db
+          PYTHONPATH: app/factorydash
+        run: |
+            python app/factorydash/manage.py migrate --settings=factorydash.settings_test
+
       - name: Run Pytest
         env:
           DJANGO_SETTINGS_MODULE: factorydash.settings_test

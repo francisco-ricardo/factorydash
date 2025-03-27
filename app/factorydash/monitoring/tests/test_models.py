@@ -8,16 +8,15 @@ from django.utils.timezone import now
 def test_machine_data_creation():
     """Test that a MachineData instance is created correctly."""
     data = MachineData.objects.create(
-        data_type="Events",
-        data_item_id="test_123",
+        machine_id="machine123",
         timestamp=now(),
-        name="TestEvent",
-        value="Running"
+        name="TestValue",
+        value="123"
     )
     assert MachineData.objects.count() == 1
     assert data.id is not None
-    assert data.data_type == "Events"
-    assert data.name == "TestEvent"
-    assert data.value == "Running"
+    assert data.machine_id == "machine123"
+    assert data.name == "TestValue"
+    assert data.value == "123"
 
 # EOF
