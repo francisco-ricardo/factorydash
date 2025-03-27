@@ -481,3 +481,96 @@ record = {
                     "name": element.tag.split("}")[1].strip() if "}" in element.tag else element.tag.strip(),
                     "value": element.text.strip() if element.text else None,
                 }
+
+
+
+
+##
+
+Think as a job interviewer. Also, you are a experienced Software Engineer.
+Generate a professional README.md file for the factorydash repo.
+This is a project for my professional portfolio. 
+The README should balance clarity and professionalism, demonstrating a solid understanding of Django's ecosystem and best practices.
+
+
+1. Project Title and Overview
+- Provide the name of the project (factorydash) and a concise description of its purpose or functionality.
+- Include a summary of the problem the app solves or the specific use case it addresses.
+
+2. Table of Contents
+
+3. Installation Instructions
+- Outline step-by-step instructions for setting up the project locally.
+
+4. Running the Application
+- Provide commands for running the development server and accessing the app locally.
+- Describe the Makefile targets and how to use them for running the app locally.
+@docker-compose-dev.yaml
+@docker-cmd-script-dev.sh
+@docker-entry-point-dev.sh
+@supervisor.dev.conf
+
+5. Configuration
+- Explain how to configure settings like the database, environment variables, or third-party API keys.
+- Suggest using .env files for environment-specific settings.
+
+6. Features
+List the key features of the application, with brief descriptions.
+- XML parsing (@load_nist_data.py)
+- UI updates with WebSockets (@consumers.py @dashboard.html)
+- Task management with Celery (@celery.py @task.py @setup_periodic_tasks.py)
+  - Load NIST Data (@load_nist_data.py)
+  - Cleanup Old Data (@cleanup.py)
+  - Update Dashboard (@tasks.py)
+- Software architecture
+  - Django (ORM, Chanels) @settings.py
+  - PostgreSQL
+  - Redis
+  - Celery
+  - supervisor
+  - daphne
+- Environment variables approach, to get flexibility
+- Data is updated every 10 seconds, to fit in the railway free tier.
+  But it can be changed.
+
+7. Testing
+- Mention pytest use.
+- Provide instructions for running tests.
+
+8. Deployment
+- Include deployment instructions, such as setting up on Railway.
+- Highlight any environment-specific settings for production ).
+- CI/CD (github action, railway.app, Dockerhub) 
+@settings.py 
+@requirements.txt 
+@Dockerfile 
+@docker-entrypoint.sh
+@deploy.yml
+
+9. Contributing
+- Provide guidelines for how others can contribute to the project.
+
+10. License
+- Open Source project
+@LICENSE.md
+
+11. Contact
+
+- Email: franciscoricardo.dev@gmail.com
+- Linkedin:
+- Github:
+
+
+
+
+
+## Database maintenance
+
+railway link
+railway connect Postgres
+
+DELETE FROM machinedata WHERE timestamp < NOW() - INTERVAL '2 days';
+VACUUM;
+VACUUM FULL;
+ANALYZE machinedata;
+REINDEX TABLE machinedata;
