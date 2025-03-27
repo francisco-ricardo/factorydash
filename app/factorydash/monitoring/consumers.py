@@ -98,7 +98,8 @@ class DashboardConsumer(AsyncWebsocketConsumer):
                         )
                     )
                     .filter(row_num=1)
-                    .order_by('-timestamp')
+                    #.order_by('-timestamp', 'machine_id', 'name')
+                    .order_by('machine_id', '-timestamp', 'name')
                     .values('timestamp', 'machine_id', 'name', 'value')
                     [offset:offset+page_size]
                 )
