@@ -451,3 +451,33 @@ Fields?
         <Normal dataItemId="Mazak03-S_6" timestamp="2025-03-25T20:56:52.953397" name="Stemp_cond" sequence="594980855" type="TEMPERATURE"/>                                                                                                                                               
     </Condition>                                                                                                                            
 </ComponentStream> 
+
+
+The function named "parse_nist_xml" is in charge of the nist xml parsing.
+Rewrite the function to extract only the following fields:
+- Streams/DeviceStream/ComponentStream/Events/Availability
+- Streams/DeviceStream/ComponentStream/Events/EmergencyStop
+- Streams/DeviceStream/ComponentStream/Samples/Xfrt
+- Streams/DeviceStream/ComponentStream/Samples/Yfrt
+- Streams/DeviceStream/ComponentStream/Samples/Zfrt
+- Streams/DeviceStream/ComponentStream/Samples/Xposition
+- Streams/DeviceStream/ComponentStream/Samples/Yposition
+- Streams/DeviceStream/ComponentStream/Samples/Zposition
+- Streams/DeviceStream/ComponentStream/Samples/Temperature
+- Streams/DeviceStream/ComponentStream/Samples/AccumulatedTime
+- Streams/DeviceStream/ComponentStream/Samples/PathFeedRate
+- Streams/DeviceStream/ComponentStream/Samples/RotaryVelocity
+
+Is important to improve the performance as much as possible.
+The function signature and the return (yield) has to be kept.
+
+I will share the file, wait.
+
+
+record = {
+                    "data_type": data_type,
+                    "data_item_id": element.attrib.get("dataItemId", "").strip(),
+                    "timestamp": timestamp,
+                    "name": element.tag.split("}")[1].strip() if "}" in element.tag else element.tag.strip(),
+                    "value": element.text.strip() if element.text else None,
+                }
