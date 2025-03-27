@@ -88,7 +88,7 @@ class Command(BaseCommand):
 
                 record = {
                     "data_type": "Events" if tag in ALLOWED_EVENTS else "Samples",
-                    "data_item_id": elem.attrib.get("dataItemId", "").strip(),
+                    "data_item_id": elem.attrib.get("dataItemId", "").strip().split("-")[0],
                     "timestamp": timestamp,
                     "name": tag,
                     "value": elem.text.strip() if elem.text else None,
