@@ -1,6 +1,12 @@
 
 # FactoryDash
 
+TODO: 
+- clean old data
+- A dashboard screenshot or GIF
+- Lessons Learned note (e.g., Docker health checks) would make it unforgettable
+- Ver melhor sobre a paginação (relamente está como 20?)
+
 **Real-Time Insights for Smart Manufacturing.**
 
 FactoryDash is a Django-based web application providing real-time 
