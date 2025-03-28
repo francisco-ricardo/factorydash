@@ -5,11 +5,18 @@
 
 FactoryDash is a Django-based web application providing real-time 
 monitoring and visualization of machine performance data from the 
-NIST Smart Manufacturing Systems (SMS) Test Bed. The SMS Test Bed 
-combines Computer-Aided Technologies (CAx) tools, a Manufacturing 
-Lab with CNC and inspection equipment, and MTConnect-standardized 
-data services to advance smart manufacturing research across the 
-product lifecycle. FactoryDash harnesses this data for actionable 
+NIST Smart Manufacturing Systems (SMS) Test Bed. 
+The SMS Test Bed uses the MTConnect standard for data collection and 
+offers various data dissemination channels: a volatile data stream via 
+MTConnect agents, a queryable data repository 
+(NIST Material Data Curation System - MDCS), and pre-compiled data packages. 
+`factorydash` primarily utilizes the real-time, volatile data stream for 
+up-to-the-second insights.  The SMS Test Bed aims to advance smart manufacturing 
+research and development across the product lifecycle, highlighting challenges 
+and requirements for cyber-physical infrastructure while providing a valuable 
+data source for researchers.
+
+FactoryDash harnesses this data for actionable 
 insights via a server-side rendered (SSR) dashboard, powered by 
 Django Channels for live updates and Celery for data processing. 
 Developed for my professional portfolio, this project showcases 
@@ -20,9 +27,8 @@ with a Docker image available at
 
 ## Features
 
-- Real-Time Dashboard: Displays live machine metrics 
-(e.g., timestamp, machine ID, parameter, value) with 
-WebSocket updates every 10 seconds.
+- Real-time Data Updates: Uses Django Channels for WebSocket 
+communication, providing live dashboard updates.
 
 - Paginated Data Delivery: WebSocket consumer implements 
 pagination (20 entries/page) using Django’s Window functions 
@@ -31,8 +37,15 @@ for efficient metric retrieval.
 - Data Visualization: Responsive Bootstrap table with client-side 
 pagination controls.
 
-- NIST SMS Integration: Fetches MTConnect data from the SMS Test 
-Bed via Celery tasks, stored in PostgreSQL.
+- Responsive UI: Uses Bootstrap for a clean and responsive user interface.
+
+- Data Ingestion: Consumes data from the NIST API, parsing XML responses 
+efficiently.
+
+- Asynchronous Task Processing: Uses Celery for background tasks 
+(data ingestion, database cleanup).
+
+- Data Persistence: Stores data in a PostgreSQL database.
 
 - Scalable Design: Asynchronous updates with Django Channels, task 
 scheduling with Celery Beat, and Redis-backed channel layers.
@@ -225,131 +238,126 @@ Hosted on Railway with CI/CD automation and a public Docker image.
 
 ## Project Structure
 
+.
+├── Dockerfile
+├── LICENSE
+├── Makefile
+├── README.md
+├── app
+│   └── factorydash
+│       ├── factorydash
+│       │   ├── __init__.py
+│       │   ├── asgi.py
+│       │   ├── celery.py
+│       │   ├── settings.py
+│       │   ├── settings_test.py
+│       │   ├── tests.py
+│       │   ├── urls.py
+│       │   └── wsgi.py
+│       ├── manage.py
+│       ├── monitoring
+│       │   ├── __init__.py
+│       │   ├── admin.py
+│       │   ├── apps.py
+│       │   ├── consumers.py
+│       │   ├── management
+│       │   │   ├── __init__.py
+│       │   │   └── commands
+│       │   │       ├── __init__.py
+│       │   │       ├── cleanup.py
+│       │   │       ├── load_nist_data.py
+│       │   │       └── setup_periodic_tasks.py
+│       │   ├── migrations
+│       │   │   ├── __init__.py
+│       │   ├── models.py
+│       │   ├── routing.py
+│       │   ├── tasks.py
+│       │   ├── templates
+│       │   │   └── monitoring
+│       │   │       └── dashboard.html
+│       │   ├── tests
+│       │   │   ├── test_integration.py
+│       │   │   ├── test_load_nist_data.py
+│       │   │   ├── test_logging.py
+│       │   │   ├── test_models.py
+│       │   │   └── test_tasks.py
+│       │   ├── tests.py
+│       │   └── views.py
+│       ├── pytest.ini
+│       └── staticfiles
+│           └── admin
+│               ├── css
+│               ├── img
+│               └── js
+├── docker-compose-dev.yaml
+├── docker-entrypoint.sh
+├── requirements.txt
+├── supervisord.conf
 
+## Development Practices
 
+- Type Hints: PEP 484-compliant for maintainability and IDE support.
 
+- Docstrings: PEP 257-compliant documentation across all modules.
 
-## EOF
+- Environment Variables: Comprehensive configuration with validation 
+  (e.g., `SECRET_KEY`, `DATABASE_URL`) for security and portability.
 
-# factorydash: Real-time Smart Manufacturing Insights
+- Testing: `pytest` and `pytest-django` ensure reliability, integrated 
+  into CI/CD.
 
-**A Django-based application providing real-time monitoring and 
-analysis of manufacturing data.**
+- Performance: Pagination in `DashboardConsumer`, database indexing, 
+  and Whitenoise compression optimize scalability.
 
-This project addresses the need for efficient and insightful monitoring of 
-smart manufacturing processes. It leverages data from the NIST Smart 
-Manufacturing Systems Test Bed (SMS Test Bed), providing a real-time 
-dashboard for visualizing key performance indicators (KPIs) and operational 
-status. The SMS Test Bed uses the MTConnect standard for data collection and 
-offers various data dissemination channels: a volatile data stream via 
-MTConnect agents, a queryable data repository 
-(NIST Material Data Curation System - MDCS), and pre-compiled data packages. 
-`factorydash` primarily utilizes the real-time, volatile data stream for 
-up-to-the-second insights.  The SMS Test Bed aims to advance smart manufacturing 
-research and development across the product lifecycle, highlighting challenges 
-and requirements for cyber-physical infrastructure while providing a valuable 
-data source for researchers.
+-  DevOps: `Makefile` and Docker Compose streamline local setup; 
+  GitHub Actions automates CI/CD.
 
-## Table of Contents
+## Challenges Overcome
 
-- Project Title and Overview
-- Installation Instructions
-- Running the Application
-- Configuration
-- Features
-- Testing
-- Deployment
-- Contributing
-- License
-- References
-- Contact
+- WebSocket Pagination: Leveraged Window and RowNumber in DashboardConsumer 
+  for efficient, unique metric delivery.
 
+- Async/Sync Integration: Resolved Channels’ async context with `sync_to_async` 
+  for ORM calls.
 
-## Installation Instructions
+- CI/CD Setup: Configured GitHub Actions for testing, Docker builds, and Railway 
+  deployment with retry logic.
 
-1. **Clone the repository:**
-```bash
-git clone <repository_url>
-cd factorydash
-```
+## Future Enhancements
 
-2. **Install dependencies:**
-```bash
-pip install -r requirements.txt
-```
+- Expanded Tests: Add WebSocket and edge-case coverage in `pytest`.
 
-3. Set up the database: (PostgreSQL is recommended; SQLite is used for testing)
-- Create a PostgreSQL database and user. 
-Update factorydash/factorydash/settings.py with your database credentials.
-- Run database migrations:
-```bash
-python manage.py migrate
-```
-- Collect static files:
-```bash
-python manage.py collectstatic
-```
+- Metric Filters: Enable user-defined queries for SMS Test Bed data.
 
-4. Running the Application
-This project uses Docker Compose for development and deployment.
+- Alerts: Integrate real-time notifications for critical events.
 
-- Start the development environment:
-```bash 
-docker-compose -f docker-compose-dev.yaml up -d
-```
+- UI Upgrades: Add `Chart.js` for trend visualizations.
 
-This starts PostgreSQL, Redis, Celery Beat, Celery Worker, and Daphne (the ASGI server).
+## Contributing
 
-- Access the dashboard: Once the containers are running, open your web browser and navigate to http://localhost:8000/.
+Contributions are welcome! Please open an issue or submit a pull request. 
+Follow standard contribution guidelines (e.g., forking, branching, testing).
 
-- Makefile Targets (if applicable): The Makefile (if provided) offers convenient targets for managing the development environment (e.g., make up, make down, make test).
+## License
 
-5. Configuration
-
-- Database: Configure database settings in factorydash/factorydash/settings.py. For production, use a robust database like PostgreSQL.
-- Environment Variables: The application uses environment variables extensively (database credentials, API keys, Celery settings). Use a .env file:
-```bash
-DATABASE_URL=postgres://user:password@host:port/database
-CELERY_BROKER_URL=redis://localhost:6379/0
-CELERY_RESULT_BACKEND=redis://localhost:6379/0
-LOAD_NIST_DATA_SCHEDULE_SECONDS=10  # Adjust data update frequency
-DATA_RETENTION_DAYS=2              # Adjust data retention period
-```
-- .env file loading: Ensure your deployment process loads environment variables from a .env file.
-
-6. Features
-- Real-time Data Updates: Uses Django Channels for WebSocket communication, providing live dashboard updates.
-- Data Ingestion: Consumes data from the NIST API, parsing XML responses efficiently.
-- Asynchronous Task Processing: Uses Celery for background tasks (data ingestion, database cleanup).
-- Data Persistence: Stores data in a PostgreSQL database (SQLite for development/testing).
-- Responsive UI: Uses Bootstrap for a clean and responsive user interface.
-- Data Pagination: Efficiently handles large datasets by paginating the displayed data.
-
-7. Testing
-The project uses `pytest` for testing. Run tests with:
-
-```bash 
-pytest
-```
-(or a Makefile target if one is defined)
-
-8. Deployment
-This application is designed for deployment using Docker and Docker Compose. Instructions for specific platforms (e.g., Railway.app) should be provided in separate documentation or within the deployment scripts. Ensure proper configuration of environment variables for production.
-
-9. Contributing
-Contributions are welcome! Please open an issue or submit a pull request. Follow standard contribution guidelines (e.g., forking, branching, testing).
-
-10. License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-11. References
-Helu M, Hedberg Jr T (2020) Connecting, Deploying, and Using the Smart Manufacturing Systems Test Bed. National Institute of Standards and Technology. doi: 10.6028/NIST.AMS.200-2
-Helu M, Hedberg Jr T (2020) Recommendations for collecting, curating, and re-using manufacturing data. National Institute of Standards and Technology, Report NIST AMS300-11. doi: 10.6028/NIST.AMS.300-11
-Hedberg Jr T, Helu M, Newrock M (2017) Software requirements specification to distribute manufacturing data. National Institute of Standards and Technology, Report NIST AMS300-2. doi: 10.6028/NIST.AMS.300-2
-Helu M, Hedberg Jr T, Barnard Feeney A (2017) Reference architecture to integrate heterogeneous manufacturing systems for the digital thread. CIRP Journal of Manufacturing Science and Technology doi: 10.1016/j.cirpj.2017.04.002
+## About
 
-12. Contact
-Email: franciscoricardo.dev@gmail.com
-LinkedIn: Francisco Aguiar
-GitHub: francisco-ricardo
-   
+Developed by Francisco Ricardo as a portfolio project to demonstrate proficiency in 
+Django’s ecosystem, real-time web applications, and smart manufacturing analytics. 
+Using the NIST SMS Test Bed, FactoryDash reflects my ability to deliver 
+production-ready solutions with modern DevOps practices-skills.
+
+- Contact: franciscoricardo.dev@gmail.com
+
+- LinkedIn: www.linkedin.com/in/francisco-aguiar-3ab650a0
+
+- GitHub: https://github.com/francisco-ricardo
+
+## References
+
+- Helu M, Hedberg Jr T (2020) Connecting, Deploying, and Using the 
+Smart Manufacturing Systems Test Bed. 
+National Institute of Standards and Technology. doi: 10.6028/NIST.AMS.200-2
+
