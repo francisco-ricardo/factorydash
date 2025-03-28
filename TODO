@@ -487,15 +487,30 @@ record = {
 
 ##
 
-Think as a job interviewer. Also, you are a experienced Software Engineer.
+You are a experienced Software Engineer.
 Generate a professional README.md file for the factorydash repo.
 This is a project for my professional portfolio. 
+So, think as a job interviewer. 
 The README should balance clarity and professionalism, demonstrating a solid understanding of Django's ecosystem and best practices.
-
+Include the following sections: (but you are free to include more information to enrich the content).
 
 1. Project Title and Overview
 - Provide the name of the project (factorydash) and a concise description of its purpose or functionality.
+  - Real-time insights for Smart Manufacturing
 - Include a summary of the problem the app solves or the specific use case it addresses.
+- Summarize the text below to give an overview about the NIST web services (Smart Manufacturing Systems Test Bed).
+
+Data is collected from the Manufacturing Lab using the MTConnect standard. That data is aggregated and published internally and externally of NIST via web services. 
+Three channels of data dissemination are available or becoming available from the SMS Test Bed: (1) a volatile data stream using an MTConnect agent, 
+(2) a query-able data repository using the NIST Material Data Curation System (MDCS), and (3) pre-compiled data packages that include a collection of CAx Lab data and 
+associated Manufacturing Lab data.
+The goal of the SMS Test Bed is to extend existing production-focused concepts by designing and architecting a test bed that enables smart manufacturing research and 
+development across the product lifecycle. This process should highlight the challenges and requirements for introducing cyber-physical infrastructure in manufacturing, 
+as well as create opportunities to provide a tangible source of data that other researchers may use to develop and validate smart manufacturing technologies. 
+It also requires the integration of systems from each product lifecycle stage so that information may flow between design, fabrication, and inspection. 
+This enables the development of technologies and standards that create a "digital thread" to exchange information, including product design and quality and equipment 
+performance and health, across the product lifecycle. These efforts complement existing research and development aimed at reducing cycle time, ensuring first-pass success, 
+and improving the overall performance of the product design and manufacturing process.
 
 2. Table of Contents
 
@@ -504,6 +519,8 @@ The README should balance clarity and professionalism, demonstrating a solid und
 
 4. Running the Application
 - Provide commands for running the development server and accessing the app locally.
+  - supervisor
+  - daphne
 - Describe the Makefile targets and how to use them for running the app locally.
 @docker-compose-dev.yaml
 @docker-cmd-script-dev.sh
@@ -516,9 +533,11 @@ The README should balance clarity and professionalism, demonstrating a solid und
 
 6. Features
 List the key features of the application, with brief descriptions.
-- XML parsing (@load_nist_data.py)
+- API Integration	
+  - Data Ingestion (NIST API Consumer)
+  - Requests (NIST API) + XML parsing (@load_nist_data.py)
 - UI updates with WebSockets (@consumers.py @dashboard.html)
-- Task management with Celery (@celery.py @task.py @setup_periodic_tasks.py)
+- Task Queue with Celery for async tasks (@celery.py @task.py @setup_periodic_tasks.py)
   - Load NIST Data (@load_nist_data.py)
   - Cleanup Old Data (@cleanup.py)
   - Update Dashboard (@tasks.py)
@@ -526,9 +545,7 @@ List the key features of the application, with brief descriptions.
   - Django (ORM, Chanels) @settings.py
   - PostgreSQL
   - Redis
-  - Celery
-  - supervisor
-  - daphne
+  - Celery  
 - Environment variables approach, to get flexibility
 - Data is updated every 10 seconds, to fit in the railway free tier.
   But it can be changed.
@@ -539,7 +556,7 @@ List the key features of the application, with brief descriptions.
 
 8. Deployment
 - Include deployment instructions, such as setting up on Railway.
-- Highlight any environment-specific settings for production ).
+- Highlight any environment-specific settings for production.
 - CI/CD (github action, railway.app, Dockerhub) 
 @settings.py 
 @requirements.txt 
@@ -554,11 +571,31 @@ List the key features of the application, with brief descriptions.
 - Open Source project
 @LICENSE.md
 
+12. References
+
+- Cite references:  Helu M, Hedberg Jr T (2020) Connecting, Deploying, and Using the Smart Manufacturing Systems Test Bed. National Institute of Standards and Technology.
+doi: 10.6028/NIST.AMS.200-2
+
+- Citation: Helu M, Hedberg Jr T (2020) Recommendations for collecting, curating, and re-using manufacturing data. National Institute of Standards and Technology, Report NIST AMS300-11. 
+doi: 10.6028/NIST.AMS.300-11
+
+- Citation: Helu M, Hedberg Jr T (2015) Enabling Smart manufacturing research and development using a product lifecycle test bed. Procedia Manufacturing, 1:86-97. 
+doi: 10.1016/j.promfg.2015.09.066
+ 
+- Citation: Hedberg Jr T, Helu M (2017) Design and configuration of the smart manufacturing systems test bed. National Institute of Standards and Technology, Report NIST AMS 200-1. 
+doi: 10.6028/NIST.AMS.200-1
+
+- Citation: Hedberg Jr T, Helu M, Newrock M (2017) Software requirements specification to distribute manufacturing data. National Institute of Standards and Technology, Report NIST AMS300-2. 
+doi: 10.6028/NIST.AMS.300-2
+
+- Citation: Helu M, Hedberg Jr T, Barnard Feeney A (2017) Reference architecture to integrate heterogeneous manufacturing systems for the digital thread. CIRP Journal of Manufacturing Science and Technology 
+doi: 10.1016/j.cirpj.2017.04.002
+
 11. Contact
 
 - Email: franciscoricardo.dev@gmail.com
-- Linkedin:
-- Github:
+- Linkedin: http://www.linkedin.com/in/francisco-aguiar-3ab650a0
+- Github: https://github.com/francisco-ricardo
 
 
 
