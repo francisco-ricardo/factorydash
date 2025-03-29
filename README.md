@@ -5,8 +5,7 @@
 
 FactoryDash is a Django-based web application providing real-time 
 monitoring and visualization of machine performance data from the 
-NIST Smart Manufacturing Systems (SMS) Test Bed
-(https://www.nist.gov/laboratories/tools-instruments/smart-manufacturing-systems-sms-test-bed). 
+NIST Smart Manufacturing Systems (SMS) Test Bed.
 The SMS Test Bed uses the MTConnect standard for data collection and 
 offers various data dissemination channels: a volatile data stream via 
 MTConnect agents, a queryable data repository 
@@ -260,6 +259,7 @@ REINDEX TABLE machinedata;
 
 ## Project Structure
 
+```bash
 .
 ├── Dockerfile
 ├── LICENSE
@@ -315,6 +315,8 @@ REINDEX TABLE machinedata;
 ├── docker-entrypoint.sh
 ├── requirements.txt
 ├── supervisord.conf
+
+```
 
 ## Development Practices
 
