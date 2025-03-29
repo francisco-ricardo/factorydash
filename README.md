@@ -1,17 +1,12 @@
 
 # FactoryDash
 
-TODO: 
-- clean old data
-- A dashboard screenshot or GIF
-- Lessons Learned note (e.g., Docker health checks) would make it unforgettable
-- Ver melhor sobre a paginação (relamente está como 20?)
-
 **Real-Time Insights for Smart Manufacturing.**
 
 FactoryDash is a Django-based web application providing real-time 
 monitoring and visualization of machine performance data from the 
-NIST Smart Manufacturing Systems (SMS) Test Bed. 
+NIST Smart Manufacturing Systems (SMS) Test Bed
+(https://www.nist.gov/laboratories/tools-instruments/smart-manufacturing-systems-sms-test-bed). 
 The SMS Test Bed uses the MTConnect standard for data collection and 
 offers various data dissemination channels: a volatile data stream via 
 MTConnect agents, a queryable data repository 
@@ -39,6 +34,10 @@ communication, providing live dashboard updates.
 - Paginated Data Delivery: WebSocket consumer implements 
 pagination (20 entries/page) using Django’s Window functions 
 for efficient metric retrieval.
+
+- Old Data Removal: Celery task cleanup_task deletes MachineData 
+records older than the retention period, configurable via 
+DATA_RETENTION_DAYS.
 
 - Data Visualization: Responsive Bootstrap table with client-side 
 pagination controls.
@@ -239,6 +238,23 @@ Hosted on Railway with CI/CD automation and a public Docker image.
 
   - GitHub Actions pipeline runs `pytest` tests, builds and pushes Docker images to 
     Docker Hub, and deploys to Railway on `main` branch pushes/PRs.
+
+- Railway Postgres Maintenance:
+
+  - Periodic optimization of the PostgreSQL database on Railway can be done with the 
+    following commands:
+
+```bash
+railway link
+railway connect Postgres
+DELETE FROM machinedata WHERE timestamp < NOW() - INTERVAL '2 days'; # Customize as desired
+VACUUM;
+VACUUM FULL;
+ANALYZE machinedata;
+REINDEX TABLE machinedata;
+```
+
+  - Complements the cleanup_task for efficient storage management.
 
 - Live URL: `https://factorydash-production.up.railway.app/`
 
