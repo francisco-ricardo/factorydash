@@ -34,7 +34,7 @@ communication, providing live dashboard updates.
 pagination (20 entries/page) using Django’s Window functions 
 for efficient metric retrieval.
 
-- Old Data Removal: Celery task cleanup_task deletes MachineData 
+- Old Data Removal: Celery task `cleanup_task` deletes `MachineData`
 records older than the retention period, configurable via 
 DATA_RETENTION_DAYS.
 
@@ -261,10 +261,20 @@ REINDEX TABLE machinedata;
 
 ```bash
 .
+├── .gitignore
+├── .dockerignore
 ├── Dockerfile
 ├── LICENSE
 ├── Makefile
 ├── README.md
+├── .devcontainer
+│   ├── Dockerfile
+│   ├── docker-cmd-script-dev.sh
+│   ├── docker-entrypoint-dev.sh
+│   └── supervisord.dev.conf
+├── .github
+│   └── workflows
+│       └── deploy.yml
 ├── app
 │   └── factorydash
 │       ├── factorydash
