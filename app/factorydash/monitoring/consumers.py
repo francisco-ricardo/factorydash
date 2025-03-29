@@ -77,7 +77,7 @@ class DashboardConsumer(AsyncWebsocketConsumer):
             page_number (int): The number of the page to fetch data from.
         """
         try:
-            page_size = 20
+            page_size = 42
             offset = (page_number - 1) * page_size
 
             # Get the latest overall timestamp
