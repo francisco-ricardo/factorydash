@@ -46,7 +46,10 @@
     - [] README
         - [x] clean old data
         - [] A dashboard screenshot or GIF
-        - [] Lessons Learned note (e.g., Docker health checks) would make it unforgettable
-        - [] Rever sobre a paginação.
+        - [] Lessons Learned note (e.g., Docker health checks) would make it unforgettable        
+        - [] Future Enhancements
+          - [] Improve the pagination. Maybe Keyset Pagination? Maybe infinite scroll?
+          - [] Shows a kind error page when SMB is not reachable
+          - [] Implement a dashboard instead of a table
     - [] Dockerhub (repository)
         - [] Improve the versioning (use a env var instead of github.sha)
