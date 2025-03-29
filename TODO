@@ -47,6 +47,6 @@
         - [x] clean old data
         - [] A dashboard screenshot or GIF
         - [] Lessons Learned note (e.g., Docker health checks) would make it unforgettable
-        - [] Ver melhor sobre a paginação (relamente está como 20?)
+        - [] Rever sobre a paginação.
     - [] Dockerhub (repository)
         - [] Improve the versioning (use a env var instead of github.sha)
