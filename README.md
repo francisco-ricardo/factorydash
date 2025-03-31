@@ -31,7 +31,7 @@ with a Docker image available at
 communication, providing live dashboard updates.
 
 - Paginated Data Delivery: WebSocket consumer implements 
-pagination (20 entries/page) using Django’s Window functions 
+pagination (42 entries/page) using Django’s Window functions 
 for efficient metric retrieval.
 
 - Old Data Removal: Celery task `cleanup_task` deletes `MachineData`
@@ -359,13 +359,41 @@ REINDEX TABLE machinedata;
 
 ## Future Enhancements
 
-- Expanded Tests: Add WebSocket and edge-case coverage in `pytest`.
+- Advanced Pagination: Replace offset-based pagination with Keyset Pagination 
+  or implement infinite scroll for smoother data navigation.
 
-- Metric Filters: Enable user-defined queries for SMS Test Bed data.
+- Dashboard Upgrade: Evolve the simple table into a full dashboard with Chart.js 
+visualizations (e.g., graphs, gauges) for richer insights.
+
+- SMB Error Handling: Add a user-friendly fallback page when the SMS Test Bed 
+  data source is inaccessible, improving resilience.
+
+- Expanded Tests: Add WebSocket and edge-case coverage in pytest.
 
 - Alerts: Integrate real-time notifications for critical events.
 
-- UI Upgrades: Add `Chart.js` for trend visualizations.
+## Lessons Learned
+
+Building FactoryDash provided valuable insights into real,time systems and 
+development workflows:
+
+- WebSocket Debugging: Integrating Django Channels revealed the complexity of 
+  mixing synchronous ORM calls with asynchronous WebSocket consumers. 
+  Initial attempts failed due to async/sync mismatches, manifesting as silent 
+  data update failures in the dashboard. Using sync_to_async resolved this, but 
+  logging WebSocket events (e.g., connect, disconnect, errors) was crucial for 
+  tracing issues like dropped connections or malformed JSON payloads. 
+  This taught me the importance of robust error handling and observability in 
+  real-time applications.
+
+- Workflow Debugging: Setting up the CI/CD pipeline and local Docker environment 
+  exposed pitfalls in process orchestration. GitHub Actions deployments to Railway 
+  occasionally failed due to network timeouts, requiring retry logic in the 
+  deploy.yml script. Locally, Docker Compose health checks for Redis and PostgreSQL 
+  were inconsistent until I tuned intervals and retries in docker-compose-dev.yaml. 
+  These experiences underscored the need for resilient automation and thorough 
+  testing of service dependencies, shaping my approach to DevOps with a focus on 
+  stability and feedback loops.
 
 ## Contributing
 
