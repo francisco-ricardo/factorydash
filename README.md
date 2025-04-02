@@ -414,15 +414,19 @@ Django’s ecosystem, real-time web applications, and smart manufacturing analyt
 Using the NIST SMS Test Bed, FactoryDash reflects my ability to deliver 
 production-ready solutions with modern DevOps practices-skills.
 
-- Contact: franciscoricardo.dev@gmail.com
-
-- LinkedIn: www.linkedin.com/in/francisco-aguiar-3ab650a0
-
-- GitHub: https://github.com/francisco-ricardo
-
 ## References
 
 - Helu M, Hedberg Jr T (2020) Connecting, Deploying, and Using the 
 Smart Manufacturing Systems Test Bed. 
 National Institute of Standards and Technology. doi: 10.6028/NIST.AMS.200-2
+
+## Contact
+
+If you have any questions or feedback, feel free to reach out:
+
+- **GitHub**: [francisco-ricardo](https://github.com/francisco-ricardo)
+- **Email**: franciscoricardo.dev@gmail.com
+- **LinkedIn**: [francisco-aguiar](www.linkedin.com/in/francisco-aguiar-3ab650a0)
+
+
 
