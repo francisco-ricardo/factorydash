@@ -193,5 +193,4 @@ and professional in all interactions.
 
 ---
 
-Thank you for contributing to FactoryDash! Your efforts 
-help make this project better for everyone.
+Thank you for contributing to FactoryDash!

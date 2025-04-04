@@ -411,8 +411,10 @@ development workflows:
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request. 
-Follow standard contribution guidelines (e.g., forking, branching, testing).
+Contributions are welcome! Please open an issue or submit a pull request.  
+Follow standard contribution guidelines (e.g., forking, branching, testing).  
+
+For detailed guidelines, see the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
 ## License
 
