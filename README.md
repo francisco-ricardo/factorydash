@@ -25,8 +25,7 @@ CI/CD pipelines, and scalable architecture, deployed on Railway
 with a Docker image available at 
 `docker pull franciscoricardodev/factorydash:latest`.
 
-![FactoryDash Table](https://github.com/francisco-ricardo/factorydash/blob/c6a0ad2b8585644bb1f50b23366dc35fdd3b3ccb/screenshots/table-screenshot.png))
-
+![FactoryDash Table](https://github.com/francisco-ricardo/factorydash/blob/c6a0ad2b8585644bb1f50b23366dc35fdd3b3ccb/screenshots/table-screenshot.png)
 
 ## Features
 
@@ -59,6 +58,16 @@ scheduling with Celery Beat, and Redis-backed channel layers.
 
 - Production-Ready: Hosted on Railway with Whitenoise for static 
 file serving and robust environment variable management.
+
+> **Important Note**: FactoryDash's data updating functionality is heavily dependent 
+on the availability of the NIST Smart Manufacturing Systems (SMS) Test Bed. 
+FactoryDash has no responsibility for the availability or reliability of the SMS Test Bed. 
+A user-friendly fallback page to manage SMS server unavailability has been added to 
+the **Future Enhancements** list to improve resilience and user experience.
+Additionally, there are instances where certain parameters may be **unavailable** from 
+the SMS Test Bed. 
+In such cases, FactoryDash cannot take any action to handle these scenarios and relies 
+entirely on the availability of the NIST Smart Manufacturing Systems (SMS) Test Bed.
 
 ## Tech Stack
 
@@ -259,6 +268,8 @@ REINDEX TABLE machinedata;
   - Complements the cleanup_task for efficient storage management.
 
 - Live URL: `https://factorydash-production.up.railway.app/`
+
+> **Deployment Consideration**: FactoryDash's real-time data ingestion and WebSocket updates require continuous processing and resource-intensive operations. These demands exceed the limitations of Railway's free tier, making it unsuitable for hosting FactoryDash. Additionally, maintaining the application on Railway.app would not be cost-effective. Research is ongoing to identify a more cost-effective Platform-as-a-Service (PaaS) for deployment.
 
 ## Project Structure
 
