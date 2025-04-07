@@ -25,8 +25,6 @@ CI/CD pipelines, and scalable architecture, deployed on Railway
 with a Docker image available at 
 `docker pull franciscoricardodev/factorydash:latest`.
 
-![FactoryDash Table](https://github.com/francisco-ricardo/factorydash/blob/c6a0ad2b8585644bb1f50b23366dc35fdd3b3ccb/screenshots/table-screenshot.png)
-
 ## Features
 
 - Real-time Data Updates: Uses Django Channels for WebSocket 
